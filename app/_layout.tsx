@@ -2,10 +2,10 @@ import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider as NavigationThemeProvider,
-} from "@react-navigation/native";
-import { Stack } from "expo-router";
+  Stack,
+} from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { FinanceProvider } from "@/src/context/FinanceContext";
 import { ThemeProvider, useTheme } from "@/src/context/ThemeContext";
@@ -26,7 +26,7 @@ function App() {
   return (
     <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
       <Stack initialRouteName="modal" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
       </Stack>
 
