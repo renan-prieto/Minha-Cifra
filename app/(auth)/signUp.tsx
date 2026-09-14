@@ -1,12 +1,11 @@
 import LogoHeader from "@/src/components/sign/LogoHeader";
 import RegisterForm from "@/src/components/sign/RegisterForm";
 import { getSignStyles } from "@/src/components/styles/stylesSign";
-import User from "@/src/model/User";
+import { useTheme } from "@/src/context/ThemeContext";
 import { api } from "@/src/services/api";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Alert, View } from "react-native";
-import { useTheme } from "@/src/context/ThemeContext";
 
 export default function SignUp() {
   const { isDark } = useTheme();

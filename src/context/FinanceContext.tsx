@@ -1,4 +1,18 @@
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import { useSQLiteContext } from "expo-sqlite";
+import React, {
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
+
+import {
+    getFinanceItems,
+    getFinanceTags,
+    insertFinanceItem,
+    insertFinanceTag,
+} from "@/src/services/financeDatabase";
 
 const MONTH_NAMES = [
   "Janeiro",
@@ -24,6 +38,7 @@ export interface ItemFinance {
   year: number;
   month: string;
   rate?: number; // porcentagem de retorno para investimentos (ex: 5 => 5%)
+  gain?: number;
 }
 
 interface NewItemFinance {
@@ -53,13 +68,13 @@ interface FinanceContextData {
   tagsInvestments: string[];
   tagsLost: string[];
 
-  addTagEarn: (tag: string) => void;
-  addTagInvestments: (tag: string) => void;
-  addTagLost: (tag: string) => void;
+  addTagEarn: (tag: string) => Promise<void>;
+  addTagInvestments: (tag: string) => Promise<void>;
+  addTagLost: (tag: string) => Promise<void>;
 
-  addEarn: (item: NewItemFinance) => void;
-  addInvestments: (item: NewItemFinance) => void;
-  addLost: (item: NewItemFinance) => void;
+  addEarn: (item: NewItemFinance) => Promise<void>;
+  addInvestments: (item: NewItemFinance) => Promise<void>;
+  addLost: (item: NewItemFinance) => Promise<void>;
 }
 
 const FinanceContext = createContext<FinanceContextData>(
@@ -67,6 +82,7 @@ const FinanceContext = createContext<FinanceContextData>(
 );
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
+  const db = useSQLiteContext();
   const [itemsEarn, setItemsEarn] = useState<ItemFinance[]>([]);
 
   const [itemsInvestments, setItemsInvestments] = useState<ItemFinance[]>([]);
@@ -78,6 +94,31 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [tagsInvestments, setTagsInvestments] = useState<string[]>([]);
 
   const [tagsLost, setTagsLost] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function loadFinanceData() {
+      const [earn, investments, lost, earnTags, investmentTags, lostTags] =
+        await Promise.all([
+          getFinanceItems(db, "earn"),
+          getFinanceItems(db, "investment"),
+          getFinanceItems(db, "lost"),
+          getFinanceTags(db, "earn"),
+          getFinanceTags(db, "investment"),
+          getFinanceTags(db, "lost"),
+        ]);
+
+      setItemsEarn(earn);
+      setItemsInvestments(investments);
+      setItemsLost(lost);
+      setTagsEarn(earnTags);
+      setTagsInvestments(investmentTags);
+      setTagsLost(lostTags);
+    }
+
+    loadFinanceData().catch((error) => {
+      console.error("Erro ao carregar dados financeiros:", error);
+    });
+  }, [db]);
 
   // =========================
   // DATA ATUAL
@@ -96,12 +137,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   // TAGS - RECEITAS
   // =========================
 
-  const addTagEarn = (tag: string) => {
+  const addTagEarn = async (tag: string) => {
     const tagFormatada = tag.trim();
 
     if (!tagFormatada) {
       return;
     }
+
+    await insertFinanceTag(db, "earn", tagFormatada);
 
     setTagsEarn((prev) => {
       if (prev.includes(tagFormatada)) {
@@ -112,12 +155,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const addTagInvestments = (tag: string) => {
+  const addTagInvestments = async (tag: string) => {
     const tagFormatada = tag.trim();
 
     if (!tagFormatada) {
       return;
     }
+
+    await insertFinanceTag(db, "investment", tagFormatada);
 
     setTagsInvestments((prev) => {
       if (prev.includes(tagFormatada)) {
@@ -128,12 +173,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const addTagLost = (tag: string) => {
+  const addTagLost = async (tag: string) => {
     const tagFormatada = tag.trim();
 
     if (!tagFormatada) {
       return;
     }
+
+    await insertFinanceTag(db, "lost", tagFormatada);
 
     setTagsLost((prev) => {
       if (prev.includes(tagFormatada)) {
@@ -144,7 +191,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const addEarn = (newItem: NewItemFinance) => {
+  const addEarn = async (newItem: NewItemFinance) => {
     const { year, month } = getCurrentDate();
 
     const itemWithId: ItemFinance = {
@@ -154,10 +201,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       month,
     };
 
-    setItemsEarn((prev) => [...prev, itemWithId]);
+    const savedItem = await insertFinanceItem(db, "earn", itemWithId);
+    setItemsEarn((prev) => [...prev, savedItem]);
   };
 
-  const addInvestments = (newItem: NewItemFinance) => {
+  const addInvestments = async (newItem: NewItemFinance) => {
     const { year, month } = getCurrentDate();
 
     const itemWithId: ItemFinance = {
@@ -167,10 +215,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       month,
     };
 
-    setItemsInvestments((prev) => [...prev, itemWithId]);
+    const savedItem = await insertFinanceItem(db, "investment", itemWithId);
+    setItemsInvestments((prev) => [...prev, savedItem]);
   };
 
-  const addLost = (newItem: NewItemFinance) => {
+  const addLost = async (newItem: NewItemFinance) => {
     const { year, month } = getCurrentDate();
 
     const itemWithId: ItemFinance = {
@@ -180,7 +229,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       month,
     };
 
-    setItemsLost((prev) => [...prev, itemWithId]);
+    const savedItem = await insertFinanceItem(db, "lost", itemWithId);
+    setItemsLost((prev) => [...prev, savedItem]);
   };
 
   const totalEarn = itemsEarn.reduce((acc, item) => acc + item.value, 0);

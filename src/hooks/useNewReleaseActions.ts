@@ -1,6 +1,6 @@
+import { useRouter } from "expo-router";
 import { useCallback } from "react";
 import { Alert } from "react-native";
-import { useRouter } from "expo-router";
 
 import { useFinance } from "@/src/context/FinanceContext";
 
@@ -44,7 +44,7 @@ export function useNewReleaseActions({
     addTagLost,
   } = useFinance();
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     if (!title.trim() || !value.trim()) {
       Alert.alert("Atenção", "Preencha o título e o valor.");
       return;
@@ -85,11 +85,11 @@ export function useNewReleaseActions({
       }
 
       item.rate = numericRate;
-      addInvestments(item);
+      await addInvestments(item);
     } else if (type === "earn") {
-      addEarn(item);
+      await addEarn(item);
     } else {
-      addLost(item);
+      await addLost(item);
     }
 
     setSelectedTag("");
@@ -107,6 +107,7 @@ export function useNewReleaseActions({
     addEarn,
     addInvestments,
     addLost,
+    rate,
     router,
     selectedTag,
     setSelectedTag,
@@ -119,17 +120,17 @@ export function useNewReleaseActions({
   ]);
 
   const handleAddTag = useCallback(
-    (tag: string) => {
+    async (tag: string) => {
       const newTag = tag.trim();
 
       if (!newTag) return;
 
       if (type === "earn") {
-        addTagEarn(newTag);
+        await addTagEarn(newTag);
       } else if (type === "investiments") {
-        addTagInvestments(newTag);
+        await addTagInvestments(newTag);
       } else {
-        addTagLost(newTag);
+        await addTagLost(newTag);
       }
 
       setSelectedTag(newTag);

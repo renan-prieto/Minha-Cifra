@@ -1,3 +1,4 @@
+import type { Href } from "expo-router";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,7 +9,7 @@ import { useTheme } from "@/src/context/ThemeContext";
 
 type StaticContentScreenProps = {
   title: string;
-  route: string;
+  route: Href;
   content: string;
 };
 

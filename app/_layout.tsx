@@ -7,9 +7,11 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 
-import { ThemeProvider, useTheme } from "@/src/context/ThemeContext";
 import { FinanceProvider } from "@/src/context/FinanceContext";
+import { ThemeProvider, useTheme } from "@/src/context/ThemeContext";
 import { UserProvider } from "@/src/context/UserContext";
+import { initializeDatabase } from "@/src/database/database";
+import { SQLiteProvider } from "expo-sqlite";
 interface UserProps {
   name: string;
   email: string;
@@ -35,12 +37,16 @@ function App() {
 
 export default function RootLayout() {
   return (
-    <UserProvider>
-      <FinanceProvider>
-        <ThemeProvider>
-          <App />
-        </ThemeProvider>
-      </FinanceProvider>
-    </UserProvider>
+    <SQLiteProvider 
+    databaseName="minhacifra.db" 
+    onInit={initializeDatabase}>
+      <UserProvider>
+        <FinanceProvider>
+          <ThemeProvider>
+            <App />
+          </ThemeProvider>
+        </FinanceProvider>
+      </UserProvider>
+    </SQLiteProvider>
   );
 }

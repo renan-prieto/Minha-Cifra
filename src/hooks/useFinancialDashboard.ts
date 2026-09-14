@@ -15,21 +15,16 @@ export function useFinancialDashboard() {
     prevMonth,
   } = useGraphicFilter();
 
+  const isCurrentMonth = (item: { month: string; year: number }) =>
+    item.month.toLocaleLowerCase() === currentMonthLabel.toLocaleLowerCase() &&
+    item.year === currentYearLabel;
+
   const dashboard = useMemo(() => {
-    const earnFiltered = itemsEarn.filter(
-      (item) =>
-        item.month === currentMonthLabel && item.year === currentYearLabel,
-    );
+    const earnFiltered = itemsEarn.filter(isCurrentMonth);
 
-    const investmentsFiltered = itemsInvestments.filter(
-      (item) =>
-        item.month === currentMonthLabel && item.year === currentYearLabel,
-    );
+    const investmentsFiltered = itemsInvestments.filter(isCurrentMonth);
 
-    const lostFiltered = itemsLost.filter(
-      (item) =>
-        item.month === currentMonthLabel && item.year === currentYearLabel,
-    );
+    const lostFiltered = itemsLost.filter(isCurrentMonth);
 
     const receitas = earnFiltered.reduce((acc, item) => acc + item.value, 0);
     const despesas = lostFiltered.reduce((acc, item) => acc + item.value, 0);
@@ -80,6 +75,7 @@ export function useFinancialDashboard() {
     itemsEarn,
     itemsInvestments,
     itemsLost,
+    isCurrentMonth,
     nextMonth,
     prevMonth,
   ]);

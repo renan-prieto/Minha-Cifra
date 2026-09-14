@@ -8,7 +8,6 @@ interface Props {
 
 export default function LogoHeader({ isDark }: Props) {
   const styles = getSignStyles(isDark);
-
   return (
     <View style={styles.header}>
       <Text style={styles.title}>Minha</Text>
