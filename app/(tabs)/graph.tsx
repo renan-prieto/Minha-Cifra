@@ -1,19 +1,19 @@
-import React from "react";
-import { ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
 import { Header } from "@/src/components/common/header";
 import BalanceCard from "@/src/components/graphs/BalanceCard";
-import MonthNavigator from "@/src/components/graphs/MonthNavigator";
 import { GraphBarLayout } from "@/src/components/graphs/GraphBarLayout";
 import { GraphPieLayout } from "@/src/components/graphs/GraphPieLayout";
+import MonthNavigator from "@/src/components/graphs/MonthNavigator";
 import { getBarStyles } from "@/src/components/styles/stylesBar";
 import { useTheme } from "@/src/context/ThemeContext";
 import { useFinancialDashboard } from "@/src/hooks/useFinancialDashboard";
+import { useState } from "react";
+import { Button, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function FinancialDashboard() {
   const { isDark } = useTheme();
   const barStyles = getBarStyles(isDark);
+  const [type, setType] = useState<"pizza" | "bars">("bars");
 
   const {
     balance,
@@ -44,6 +44,8 @@ export default function FinancialDashboard() {
 
         <BalanceCard balance={balance} />
 
+        
+        
         <MonthNavigator
           prevMonth={currentPrevMonth}
           month={currentMonthLabel}
@@ -53,15 +55,24 @@ export default function FinancialDashboard() {
           onNext={nextMonth}
         />
 
-        <GraphBarLayout
-          data={barData}
-          maxValue={maxValue}
-          receitas={receitas}
-          despesas={despesas}
-          investimentos={investimentos}
-        />
+        <Button title="Pizza" onPress={() => setType("pizza")} />
+        <Button title="Barras" onPress={() => setType("bars")} />
 
-        <GraphPieLayout data={pizzaData} />
+        {type === "bars" ? (
+          <GraphBarLayout
+            data={barData}
+            maxValue={maxValue}
+            receitas={receitas}
+            despesas={despesas}
+            investimentos={investimentos}
+          />
+        ) : (
+          <GraphPieLayout data={pizzaData} />
+        )
+        
+        }
+  
+        
       </ScrollView>
     </SafeAreaView>
   );
