@@ -1,10 +1,9 @@
 import { useTheme } from "@/src/context/ThemeContext";
 import React from "react";
 import {
-  Text,
-  TouchableOpacity,
-  TouchableOpacityProps,
-  useColorScheme,
+    Text,
+    TouchableOpacity,
+    TouchableOpacityProps,
 } from "react-native";
 import { getHomeStyles } from "../styles/stylesHome";
 import { getSignStyles } from "../styles/stylesSign";
@@ -20,7 +19,7 @@ interface ModalButtonProps extends TouchableOpacityProps {
 }
 
 const AuthButton: React.FC<AuthButtonProps> = ({ title, ...props }) => {
-  const isDark = useColorScheme() === "dark";
+  const { isDark } = useTheme();
   const styles = getSignStyles(isDark);
 
   return (
