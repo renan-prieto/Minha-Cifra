@@ -2,7 +2,7 @@ import type { SQLiteDatabase } from "expo-sqlite";
 
 import type { ItemFinance } from "@/src/context/FinanceContext";
 
-type FinanceType = "earn" | "investment" | "lost";
+export type FinanceType = "earn" | "investment" | "lost";
 
 type DatabaseItem = {
   id: number;
@@ -221,4 +221,37 @@ export async function insertFinanceTag(
   tagName: string,
 ) {
   await getOrCreateTag(db, tagName, type, new Date().toISOString());
+}
+
+export async function updateFinanceTag(
+  db: SQLiteDatabase,
+  type: FinanceType,
+  currentName: string,
+  nextName: string,
+) {
+  await db.runAsync(
+    `
+      UPDATE tag
+      SET tag_nome = ?
+      WHERE tag_nome = ? AND tag_tipo = ?
+    `,
+    nextName,
+    currentName,
+    typeToTagType[type],
+  );
+}
+
+export async function deleteFinanceTag(
+  db: SQLiteDatabase,
+  type: FinanceType,
+  tagName: string,
+) {
+  await db.runAsync(
+    `
+      DELETE FROM tag
+      WHERE tag_nome = ? AND tag_tipo = ?
+    `,
+    tagName,
+    typeToTagType[type],
+  );
 }

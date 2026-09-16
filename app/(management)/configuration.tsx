@@ -1,13 +1,13 @@
+import { ArrowBackHeader } from "@/src/components/common/arrowBackHeader";
 import ConfigButton from "@/src/components/config/ConfigButton";
 import SettingsActionButton from "@/src/components/config/SettingsActionButton";
 import SettingsToggleItem from "@/src/components/config/SettingsToggleItem";
-import { ArrowBackHeader } from "@/src/components/common/arrowBackHeader";
 import DeleteAccountModal from "@/src/components/modal/deleteAccountModal";
 import { getConfigStyles } from "@/src/components/styles/stylesConfig";
 import { useTheme } from "@/src/context/ThemeContext";
 import { useConfigurationActions } from "@/src/hooks/useConfigurationActions";
 import { Href, router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface ConfigsOptions {
@@ -29,8 +29,8 @@ export default function SettingsScreen() {
 
   const ConfigsOptionsList: ConfigsOptions[] = [
     {
-      text: "Outras opções",
-      router: "/(management)/views/otherOpitions",
+      text: "Gerenciar Tags",
+      router: "/(management)/tags",
     },
     {
       text: "Alterar Dados",

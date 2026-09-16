@@ -7,11 +7,14 @@ import React, {
     useState,
 } from "react";
 
+import type { FinanceType } from "@/src/services/financeDatabase";
 import {
+    deleteFinanceTag,
     getFinanceItems,
     getFinanceTags,
     insertFinanceItem,
     insertFinanceTag,
+    updateFinanceTag,
 } from "@/src/services/financeDatabase";
 
 const MONTH_NAMES = [
@@ -71,6 +74,12 @@ interface FinanceContextData {
   addTagEarn: (tag: string) => Promise<void>;
   addTagInvestments: (tag: string) => Promise<void>;
   addTagLost: (tag: string) => Promise<void>;
+  renameTag: (
+    type: FinanceType,
+    currentName: string,
+    nextName: string,
+  ) => Promise<void>;
+  deleteTag: (type: FinanceType, tagName: string) => Promise<void>;
 
   addEarn: (item: NewItemFinance) => Promise<void>;
   addInvestments: (item: NewItemFinance) => Promise<void>;
@@ -233,6 +242,40 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     setItemsLost((prev) => [...prev, savedItem]);
   };
 
+  const renameTag = async (
+    type: FinanceType,
+    currentName: string,
+    nextName: string,
+  ) => {
+    const trimmedName = nextName.trim();
+
+    if (!trimmedName || trimmedName === currentName) {
+      return;
+    }
+
+    await updateFinanceTag(db, type, currentName, trimmedName);
+    const updateList = (tags: string[]) =>
+      tags.map((tag) => (tag === currentName ? trimmedName : tag));
+
+    if (type === "earn") setTagsEarn(updateList);
+    if (type === "investment") setTagsInvestments(updateList);
+    if (type === "lost") setTagsLost(updateList);
+  };
+
+  const deleteTag = async (type: FinanceType, tagName: string) => {
+    await deleteFinanceTag(db, type, tagName);
+
+    if (type === "earn") {
+      setTagsEarn((prev) => prev.filter((tag) => tag !== tagName));
+    }
+    if (type === "investment") {
+      setTagsInvestments((prev) => prev.filter((tag) => tag !== tagName));
+    }
+    if (type === "lost") {
+      setTagsLost((prev) => prev.filter((tag) => tag !== tagName));
+    }
+  };
+
   const totalEarn = itemsEarn.reduce((acc, item) => acc + item.value, 0);
 
   const totalInvestments = itemsInvestments.reduce(
@@ -269,6 +312,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         addTagEarn,
         addTagInvestments,
         addTagLost,
+        renameTag,
+        deleteTag,
 
         addEarn,
         addInvestments,
