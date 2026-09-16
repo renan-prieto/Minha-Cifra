@@ -222,5 +222,23 @@ export const SOBREAPP = {
 } as const;
 
 export const SOBRENOS = {
-  text: "",
+  title_kaue: "Kauê Cardoso dos Santos",
+  subtitle_kaue: "Dev Front-end, responsável pela estrutura de dados e líder do projeto.",
+  text_kaue: "Estudante de escola técnica que busca se profissionalizar e se preparar para o mercado de trabalho.",
+  linkedin_kaue: "LinkedIn: https://www.linkedin.com/in/kauê-cardoso-684633437",
+  
+  title_renan: "Renan Prieto da Silva",
+  subtitle_renan: "Desenvolvedor Full Stack, responsável pelo Back-end e Front-end.",
+  text_renan: "Atua na aplicação e no gerenciamento das regras de negócio durante o desenvolvimento do projeto. Possui interesse na área de Back-end, buscando aprimorar projetos e sistemas.",
+  linkedin_renan: "LinkedIn: https://www.linkedin.com/in/renan-prieto-543a48398/",
+  
+  title_tobias: "Tobias Augusto Rodrigues da Conceição",
+  subtitle_tobias: "Responsável pelo diário de bordo.",
+  text_tobias: "Sou uma pessoa simples e não possuo muitos interesses, mas estou sempre disposto a fazer o que me foi designado, independentemente da dificuldade.",
+  linkedin_tobias: "LinkedIn: https://www.linkedin.com/in/tobias-conceição-3b14aa437",
+
+  title_vitoria: "Vitória Franco de Oliveira",
+  subtitle_vitoria: "Responsável pela documentação e pelo gerenciamento do projeto.",
+  text_vitoria: "Garante a organização e o desenvolvimento das etapas. Tem interesse na área de Sistemas de Informação e busca construir uma carreira voltada à gestão e ao desenvolvimento de soluções tecnológicas.",
+  linkedin_vitoria: "LinkedIn: https://www.linkedin.com/in/vit%C3%B3ria-undefined-49b741426",
 } as const;
