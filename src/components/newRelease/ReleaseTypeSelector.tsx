@@ -1,6 +1,5 @@
-import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { Text, TouchableOpacity, View } from "react-native";
 
 import { getNewReleaseStyles } from "@/src/components/styles/stylesNewRelease";
 import { ReleaseType } from "@/src/hooks/useNewReleaseActions";

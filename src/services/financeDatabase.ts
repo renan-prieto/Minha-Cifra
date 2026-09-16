@@ -246,6 +246,21 @@ export async function deleteFinanceTag(
   type: FinanceType,
   tagName: string,
 ) {
+  const table = type === "earn" ? "renda" : type === "lost" ? "gastos" : "investimentos";
+
+  await db.runAsync(
+    `
+      DELETE FROM ${table}
+      WHERE tag_id IN (
+        SELECT tag_id
+        FROM tag
+        WHERE tag_nome = ? AND tag_tipo = ?
+      )
+    `,
+    tagName,
+    typeToTagType[type],
+  );
+
   await db.runAsync(
     `
       DELETE FROM tag

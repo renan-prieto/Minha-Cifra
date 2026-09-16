@@ -265,14 +265,20 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const deleteTag = async (type: FinanceType, tagName: string) => {
     await deleteFinanceTag(db, type, tagName);
 
+    const removeTagFromItems = (items: ItemFinance[]) =>
+      items.filter((item) => item.tag !== tagName);
+
     if (type === "earn") {
       setTagsEarn((prev) => prev.filter((tag) => tag !== tagName));
+      setItemsEarn(removeTagFromItems);
     }
     if (type === "investment") {
       setTagsInvestments((prev) => prev.filter((tag) => tag !== tagName));
+      setItemsInvestments(removeTagFromItems);
     }
     if (type === "lost") {
       setTagsLost((prev) => prev.filter((tag) => tag !== tagName));
+      setItemsLost(removeTagFromItems);
     }
   };
 

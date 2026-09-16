@@ -1,14 +1,14 @@
 import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-    Alert,
-    Modal,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+	Alert,
+	Modal,
+	Pressable,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -161,7 +161,7 @@ export default function TagsScreen() {
 				<View style={styles.overlay}>
 					<View style={[styles.modal, { backgroundColor: isDark ? "#1E1E1E" : "#FFFFFF" }]}>
 						<Text style={[styles.modalTitle, { color: isDark ? "#FFFFFF" : "#000000" }]}>{editingTag ? "Editar tag" : "Excluir tag"}</Text>
-						<Text style={[styles.modalSubtitle, { color: isDark ? "#CCCCCC" : "#555555" }]}>{editingTag ? "Escolha um novo nome para esta tag." : `Digite ${deletingTag?.name} para confirmar a exclusão.`}</Text>
+						<Text style={[styles.modalSubtitle, { color: isDark ? "#CCCCCC" : "#555555" }]}>{editingTag ? "Escolha um novo nome para esta tag." : `Digite ${deletingTag?.name} para confirmar a exclusão. Ao excluir, todos os itens associados serão removidos.`}</Text>
 						<TextInput
 							autoFocus
 							value={tagName}
