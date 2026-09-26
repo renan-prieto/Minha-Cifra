@@ -56,12 +56,14 @@ export const getOnboardingStyles = (isDark: boolean) =>
     },
 
     subtitle: {
-      fontSize: 15,
+      fontSize: 18,
+      fontWeight: "600",
       textAlign: "center",
-      color: isDark ? "#B8C7DD" : "#E0ECFF",
+      color: isDark ? "#D6E5FA" : "#F0F6FF",
       paddingHorizontal: 20,
-      marginBottom: 20,
-      lineHeight: 22,
+      marginBottom: 1,
+      lineHeight: 26,
+      letterSpacing: 0.3,
     },
 
     cardActions: {
@@ -143,5 +145,12 @@ export const getOnboardingStyles = (isDark: boolean) =>
       fontSize: 16,
       fontWeight: "800",
       color: isDark ? "#8FC5FF" : "#006BFF",
+    },
+
+    onboardingImage: {
+      width: "100%",
+      height: 450,
+      marginTop: 0,
+      marginBottom: -20,
     },
   });

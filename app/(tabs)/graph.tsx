@@ -7,7 +7,7 @@ import { getBarStyles } from "@/src/components/styles/stylesBar";
 import { useTheme } from "@/src/context/ThemeContext";
 import { useFinancialDashboard } from "@/src/hooks/useFinancialDashboard";
 import { useState } from "react";
-import { Button, ScrollView } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function FinancialDashboard() {
@@ -44,8 +44,6 @@ export default function FinancialDashboard() {
 
         <BalanceCard balance={balance} />
 
-        
-        
         <MonthNavigator
           prevMonth={currentPrevMonth}
           month={currentMonthLabel}
@@ -55,8 +53,43 @@ export default function FinancialDashboard() {
           onNext={nextMonth}
         />
 
-        <Button title="Pizza" onPress={() => setType("pizza")} />
-        <Button title="Barras" onPress={() => setType("bars")} />
+        <View style={barStyles.graphButtons}>
+          <Pressable
+            onPress={() => setType("bars")}
+            style={({ pressed }) => [
+              barStyles.graphButton,
+              type === "bars" && barStyles.graphButtonActive,
+              pressed && barStyles.graphButtonPressed,
+            ]}
+          >
+            <Text
+              style={[
+                barStyles.graphButtonText,
+                type === "bars" && barStyles.graphButtonTextActive,
+              ]}
+            >
+              Barras
+            </Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => setType("pizza")}
+            style={({ pressed }) => [
+              barStyles.graphButton,
+              type === "pizza" && barStyles.graphButtonActive,
+              pressed && barStyles.graphButtonPressed,
+            ]}
+          >
+            <Text
+              style={[
+                barStyles.graphButtonText,
+                type === "pizza" && barStyles.graphButtonTextActive,
+              ]}
+            >
+              Pizza
+            </Text>
+          </Pressable>
+        </View>
 
         {type === "bars" ? (
           <GraphBarLayout
@@ -68,11 +101,7 @@ export default function FinancialDashboard() {
           />
         ) : (
           <GraphPieLayout data={pizzaData} />
-        )
-        
-        }
-  
-        
+        )}
       </ScrollView>
     </SafeAreaView>
   );
