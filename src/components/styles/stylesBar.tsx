@@ -138,13 +138,17 @@ export const getBarStyles = (isDark: boolean) =>
     graphButtons: {
       flexDirection: "row",
       justifyContent: "center",
-      gap: 14,
+      gap: 20,
+      padding: 20,
+      borderRadius: 24,
       width: "100%",
       marginVertical: 18,
+      backgroundColor: isDark ? "#101E36" : "#F7F9FC",
+
     },
     graphButton: {
       width: 145,
-      height: 58,
+      height: 48,
       borderRadius: 18,
       justifyContent: "center",
       alignItems: "center",
@@ -204,7 +208,7 @@ export const getBarStyles = (isDark: boolean) =>
       color: "#FFFFFF",
     },
     graphButtonText: {
-      fontSize: 16,
+      fontSize: 14,
       fontWeight: "800",
       color: isDark ? "#B8CCE5" : "#006BFF",
     },

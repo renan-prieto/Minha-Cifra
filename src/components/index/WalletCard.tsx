@@ -79,7 +79,7 @@ export default function WalletCard({
         <Text style={styles.cardValue}>
           {hidden
             ? "R$ •••••"
-            : `R$ ${type === "investments" || type === "lost" ? "-" : ""}${total.toLocaleString(
+            : `R$ ${type === "lost" ? "-" : ""}${total.toLocaleString(
                 "pt-BR",
                 {
                   minimumFractionDigits: 2,

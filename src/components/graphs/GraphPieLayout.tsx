@@ -1,4 +1,3 @@
-import React from "react";
 import { Text, View } from "react-native";
 
 import LegendList from "@/src/components/graphs/LegendList";
@@ -90,14 +89,6 @@ export const GraphPieLayout = ({
 
             <Text style={pizzaStyles.summaryValue}>{maiorGastoFinal}</Text>
           </View>
-
-          {
-            //          <View style={pizzaStyles.summaryCard}>
-            //            <Text style={pizzaStyles.summaryLabel}>Tag</Text>
-            //
-            //            <Text style={pizzaStyles.summaryValue}>{categoriaFinal}</Text>
-            //          </View>
-          }
 
           <View style={pizzaStyles.summaryCard}>
             <Text style={pizzaStyles.summaryLabel}>Total</Text>

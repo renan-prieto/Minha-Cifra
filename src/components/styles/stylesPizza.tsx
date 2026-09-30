@@ -50,7 +50,7 @@ export const getPizzaStyles = (isDark: boolean) =>
     pizzaCard: {
       flex: 1,
       minHeight: 480,
-      backgroundColor: isDark ? "#101E36" : "#F7F9FC",
+      backgroundColor: isDark ? "#102845" : "#FFFFFF",
       borderRadius: 24,
       paddingHorizontal: 18,
       paddingTop: 20,
