@@ -2,8 +2,10 @@ import { useSQLiteContext } from "expo-sqlite";
 import React, {
     createContext,
     ReactNode,
+    useCallback,
     useContext,
     useEffect,
+    useMemo,
     useState,
 } from "react";
 
@@ -31,6 +33,15 @@ const MONTH_NAMES = [
   "Novembro",
   "Dezembro",
 ];
+
+function getCurrentDate() {
+  const date = new Date();
+
+  return {
+    year: date.getFullYear(),
+    month: MONTH_NAMES[date.getMonth()],
+  };
+}
 
 export interface ItemFinance {
   id: string;
@@ -133,20 +144,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   // DATA ATUAL
   // =========================
 
-  const getCurrentDate = () => {
-    const date = new Date();
-
-    return {
-      year: date.getFullYear(),
-      month: MONTH_NAMES[date.getMonth()],
-    };
-  };
-
   // =========================
   // TAGS - RECEITAS
   // =========================
 
-  const addTagEarn = async (tag: string) => {
+  const addTagEarn = useCallback(async (tag: string) => {
     const tagFormatada = tag.trim();
 
     if (!tagFormatada) {
@@ -162,9 +164,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
       return [...prev, tagFormatada];
     });
-  };
+  }, [db]);
 
-  const addTagInvestments = async (tag: string) => {
+  const addTagInvestments = useCallback(async (tag: string) => {
     const tagFormatada = tag.trim();
 
     if (!tagFormatada) {
@@ -180,9 +182,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
       return [...prev, tagFormatada];
     });
-  };
+  }, [db]);
 
-  const addTagLost = async (tag: string) => {
+  const addTagLost = useCallback(async (tag: string) => {
     const tagFormatada = tag.trim();
 
     if (!tagFormatada) {
@@ -198,9 +200,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
       return [...prev, tagFormatada];
     });
-  };
+  }, [db]);
 
-  const addEarn = async (newItem: NewItemFinance) => {
+  const addEarn = useCallback(async (newItem: NewItemFinance) => {
     const { year, month } = getCurrentDate();
 
     const itemWithId: ItemFinance = {
@@ -212,9 +214,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
     const savedItem = await insertFinanceItem(db, "earn", itemWithId);
     setItemsEarn((prev) => [...prev, savedItem]);
-  };
+  }, [db]);
 
-  const addInvestments = async (newItem: NewItemFinance) => {
+  const addInvestments = useCallback(async (newItem: NewItemFinance) => {
     const { year, month } = getCurrentDate();
 
     const itemWithId: ItemFinance = {
@@ -226,9 +228,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
     const savedItem = await insertFinanceItem(db, "investment", itemWithId);
     setItemsInvestments((prev) => [...prev, savedItem]);
-  };
+  }, [db]);
 
-  const addLost = async (newItem: NewItemFinance) => {
+  const addLost = useCallback(async (newItem: NewItemFinance) => {
     const { year, month } = getCurrentDate();
 
     const itemWithId: ItemFinance = {
@@ -240,9 +242,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
     const savedItem = await insertFinanceItem(db, "lost", itemWithId);
     setItemsLost((prev) => [...prev, savedItem]);
-  };
+  }, [db]);
 
-  const renameTag = async (
+  const renameTag = useCallback(async (
     type: FinanceType,
     currentName: string,
     nextName: string,
@@ -260,9 +262,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     if (type === "earn") setTagsEarn(updateList);
     if (type === "investment") setTagsInvestments(updateList);
     if (type === "lost") setTagsLost(updateList);
-  };
+  }, [db]);
 
-  const deleteTag = async (type: FinanceType, tagName: string) => {
+  const deleteTag = useCallback(async (type: FinanceType, tagName: string) => {
     await deleteFinanceTag(db, type, tagName);
 
     const removeTagFromItems = (items: ItemFinance[]) =>
@@ -280,52 +282,69 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       setTagsLost((prev) => prev.filter((tag) => tag !== tagName));
       setItemsLost(removeTagFromItems);
     }
-  };
+  }, [db]);
 
-  const totalEarn = itemsEarn.reduce((acc, item) => acc + item.value, 0);
-
-  const totalInvestments = itemsInvestments.reduce(
-    (acc, item) => acc + item.value,
-    0,
+  const totalEarn = useMemo(
+    () => itemsEarn.reduce((acc, item) => acc + item.value, 0),
+    [itemsEarn],
   );
 
-  const totalLost = itemsLost.reduce((acc, item) => acc + item.value, 0);
+  const totalInvestments = useMemo(
+    () => itemsInvestments.reduce((acc, item) => acc + item.value, 0),
+    [itemsInvestments],
+  );
+
+  const totalLost = useMemo(
+    () => itemsLost.reduce((acc, item) => acc + item.value, 0),
+    [itemsLost],
+  );
 
   const balance = totalEarn - (totalLost + totalInvestments);
+  const value = useMemo(() => ({
+    itemsEarn,
+    setItemsEarn,
+    itemsInvestments,
+    setItemsInvestments,
+    itemsLost,
+    setItemsLost,
+    totalEarn,
+    totalInvestments,
+    totalLost,
+    balance,
+    tagsEarn,
+    tagsInvestments,
+    tagsLost,
+    addTagEarn,
+    addTagInvestments,
+    addTagLost,
+    renameTag,
+    deleteTag,
+    addEarn,
+    addInvestments,
+    addLost,
+  }), [
+    itemsEarn,
+    itemsInvestments,
+    itemsLost,
+    totalEarn,
+    totalInvestments,
+    totalLost,
+    balance,
+    tagsEarn,
+    tagsInvestments,
+    tagsLost,
+    addTagEarn,
+    addTagInvestments,
+    addTagLost,
+    renameTag,
+    deleteTag,
+    addEarn,
+    addInvestments,
+    addLost,
+  ]);
 
   return (
-    <FinanceContext.Provider
-      value={{
-        itemsEarn,
-        setItemsEarn,
-
-        itemsInvestments,
-        setItemsInvestments,
-
-        itemsLost,
-        setItemsLost,
-
-        totalEarn,
-        totalInvestments,
-        totalLost,
-
-        balance,
-
-        tagsEarn,
-        tagsInvestments,
-        tagsLost,
-
-        addTagEarn,
-        addTagInvestments,
-        addTagLost,
-        renameTag,
-        deleteTag,
-
-        addEarn,
-        addInvestments,
-        addLost,
-      }}
-    >
+    <FinanceContext.Provider value={value}>
       {children}
     </FinanceContext.Provider>
   );

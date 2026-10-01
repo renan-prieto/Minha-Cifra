@@ -15,11 +15,12 @@ export function useFinancialDashboard() {
     prevMonth,
   } = useGraphicFilter();
 
-  const isCurrentMonth = (item: { month: string; year: number }) =>
-    item.month.toLocaleLowerCase() === currentMonthLabel.toLocaleLowerCase() &&
-    item.year === currentYearLabel;
-
   const dashboard = useMemo(() => {
+    const isCurrentMonth = (item: { month: string; year: number }) =>
+      item.month.toLocaleLowerCase() ===
+        currentMonthLabel.toLocaleLowerCase() &&
+      item.year === currentYearLabel;
+
     const earnFiltered = itemsEarn.filter(isCurrentMonth);
 
     const investmentsFiltered = itemsInvestments.filter(isCurrentMonth);
@@ -75,7 +76,6 @@ export function useFinancialDashboard() {
     itemsEarn,
     itemsInvestments,
     itemsLost,
-    isCurrentMonth,
     nextMonth,
     prevMonth,
   ]);
