@@ -1,6 +1,7 @@
+import type { TaxKey } from "@/src/context/TaxSettingsContext";
 import { useMemo, useState } from "react";
 
-export function useCalculator() {
+export function useCalculator(taxes: Record<TaxKey, boolean>) {
   const [salario, setSalario] = useState(0);
   const [salarioCopy, setSalarioCopy] = useState(0);
   const [inss, setInss] = useState(0);
@@ -77,12 +78,14 @@ export function useCalculator() {
   };
 
   const result = useMemo(() => {
-    const aliquotaInss = salarioCopy > 0 ? (inss / salarioCopy) * 100 : 0;
-    const aliquotaIr = salarioCopy > 0 ? (imposto / salarioCopy) * 100 : 0;
-    const totalDescontos = imposto + inss;
+    const selectedInss = taxes.inss ? inss : 0;
+    const selectedIncomeTax = taxes.irrf ? imposto : 0;
+    const aliquotaInss = salarioCopy > 0 ? (selectedInss / salarioCopy) * 100 : 0;
+    const aliquotaIr = salarioCopy > 0 ? (selectedIncomeTax / salarioCopy) * 100 : 0;
+    const totalDescontos = selectedIncomeTax + selectedInss;
     const percentual =
       salarioCopy > 0 ? (totalDescontos / salarioCopy) * 100 : 0;
-    const salarioLiquido = salarioCopy - inss - imposto;
+    const salarioLiquido = salarioCopy - selectedInss - selectedIncomeTax;
 
     return {
       aliquotaInss,
@@ -92,7 +95,7 @@ export function useCalculator() {
       salarioLiquido,
       baseCalculo: salarioCopy - inss,
     };
-  }, [imposto, inss, salarioCopy]);
+  }, [imposto, inss, salarioCopy, taxes]);
 
   return {
     salario,

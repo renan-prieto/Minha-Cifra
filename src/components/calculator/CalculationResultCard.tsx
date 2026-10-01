@@ -1,4 +1,3 @@
-import React from "react";
 import { Text, View } from "react-native";
 
 import { getCalcStyles } from "@/src/components/styles/stylesCalc";
@@ -14,6 +13,8 @@ type CalculationResultCardProps = {
   aliquotaInss: number;
   aliquotaIr: number;
   percentual: number;
+  showInss: boolean;
+  showIncomeTax: boolean;
 };
 
 export default function CalculationResultCard({
@@ -26,6 +27,8 @@ export default function CalculationResultCard({
   aliquotaInss,
   aliquotaIr,
   percentual,
+  showInss,
+  showIncomeTax,
 }: CalculationResultCardProps) {
   const { isDark } = useTheme();
   const styles = getCalcStyles(isDark);
@@ -47,32 +50,38 @@ export default function CalculationResultCard({
 
       <View style={styles.divider} />
 
-      <View style={styles.resultItem}>
-        <Text style={styles.resultLabel}>INSS</Text>
-        <Text style={styles.resultValue}>R$ {formatCurrency(inss)}</Text>
-      </View>
+      {showInss && (
+        <View style={styles.resultItem}>
+          <Text style={styles.resultLabel}>INSS</Text>
+          <Text style={styles.resultValue}>R$ {formatCurrency(inss)}</Text>
+        </View>
+      )}
 
-      <View style={styles.resultItem}>
-        <Text style={styles.resultLabel}>Base de Cálculo</Text>
-        <Text style={styles.resultValue}>
-          R$ {formatCurrency(salarioCopy - inss)}
-        </Text>
-      </View>
+      {showIncomeTax && (
+        <>
+          <View style={styles.resultItem}>
+            <Text style={styles.resultLabel}>Base de Cálculo</Text>
+            <Text style={styles.resultValue}>
+              R$ {formatCurrency(salarioCopy - inss)}
+            </Text>
+          </View>
 
-      <View style={styles.resultItem}>
-        <Text style={styles.resultLabel}>Imposto Bruto</Text>
-        <Text style={styles.resultValue}>R$ {formatCurrency(imposto)}</Text>
-      </View>
+          <View style={styles.resultItem}>
+            <Text style={styles.resultLabel}>Imposto Bruto</Text>
+            <Text style={styles.resultValue}>R$ {formatCurrency(imposto + desconto)}</Text>
+          </View>
 
-      <View style={styles.resultItem}>
-        <Text style={styles.resultLabel}>Desconto Legal</Text>
-        <Text style={styles.resultValue}>R$ {formatCurrency(desconto)}</Text>
-      </View>
+          <View style={styles.resultItem}>
+            <Text style={styles.resultLabel}>Desconto Legal</Text>
+            <Text style={styles.resultValue}>R$ {formatCurrency(desconto)}</Text>
+          </View>
 
-      <View style={styles.resultItem}>
-        <Text style={styles.resultLabel}>IRRF</Text>
-        <Text style={styles.resultValue}>R$ {formatCurrency(imposto)}</Text>
-      </View>
+          <View style={styles.resultItem}>
+            <Text style={styles.resultLabel}>IRRF</Text>
+            <Text style={styles.resultValue}>R$ {formatCurrency(imposto)}</Text>
+          </View>
+        </>
+      )}
 
       <View style={styles.divider} />
 
@@ -92,15 +101,19 @@ export default function CalculationResultCard({
 
       <View style={styles.divider} />
 
-      <View style={styles.resultItem}>
-        <Text style={styles.resultLabel}>Alíquota INSS</Text>
-        <Text style={styles.resultValue}>{aliquotaInss.toFixed(3)}%</Text>
-      </View>
+      {showInss && (
+        <View style={styles.resultItem}>
+          <Text style={styles.resultLabel}>Alíquota INSS</Text>
+          <Text style={styles.resultValue}>{aliquotaInss.toFixed(3)}%</Text>
+        </View>
+      )}
 
-      <View style={styles.resultItem}>
-        <Text style={styles.resultLabel}>Alíquota IR</Text>
-        <Text style={styles.resultValue}>{aliquotaIr.toFixed(3)}%</Text>
-      </View>
+      {showIncomeTax && (
+        <View style={styles.resultItem}>
+          <Text style={styles.resultLabel}>Alíquota IR</Text>
+          <Text style={styles.resultValue}>{aliquotaIr.toFixed(3)}%</Text>
+        </View>
+      )}
 
       <View style={styles.resultItem}>
         <Text style={styles.resultLabel}>Carga Tributária</Text>

@@ -29,6 +29,22 @@ export const getCalcStyles = (isDark: boolean) =>
       fontSize: 15,
       textAlign: "left",
     },
+    taxSettingsButton: {
+      minHeight: 46,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 9,
+      paddingHorizontal: 16,
+      borderRadius: 12,
+      backgroundColor: isDark ? "#101E36" : "#F7F9FC",
+      marginBottom: 12,
+    },
+    taxSettingsButtonText: {
+      color: isDark ? "#FFFFFF" : "#001B44",
+      fontSize: 15,
+      fontWeight: "700",
+    },
     inputCard: {
       width: "100%",
       backgroundColor: isDark ? "#101E36" : "#F7F9FC",

@@ -1,13 +1,14 @@
 import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider as NavigationThemeProvider,
-  Stack,
+    DarkTheme,
+    DefaultTheme,
+    ThemeProvider as NavigationThemeProvider,
+    Stack,
 } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 
 import { FinanceProvider } from "@/src/context/FinanceContext";
+import { TaxSettingsProvider } from "@/src/context/TaxSettingsContext";
 import { ThemeProvider, useTheme } from "@/src/context/ThemeContext";
 import { UserProvider } from "@/src/context/UserContext";
 import { initializeDatabase } from "@/src/database/database";
@@ -41,11 +42,13 @@ export default function RootLayout() {
     databaseName="minhacifra.db" 
     onInit={initializeDatabase}>
       <UserProvider>
-        <FinanceProvider>
-          <ThemeProvider>
-            <App />
-          </ThemeProvider>
-        </FinanceProvider>
+        <TaxSettingsProvider>
+          <FinanceProvider>
+            <ThemeProvider>
+              <App />
+            </ThemeProvider>
+          </FinanceProvider>
+        </TaxSettingsProvider>
       </UserProvider>
     </SQLiteProvider>
   );

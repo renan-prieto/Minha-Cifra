@@ -8,6 +8,7 @@ import { useTheme } from "@/src/context/ThemeContext";
 import { useConfigurationActions } from "@/src/hooks/useConfigurationActions";
 import { Href, router } from "expo-router";
 import { useState } from "react";
+import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface ConfigsOptions {
@@ -56,45 +57,47 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ArrowBackHeader title="Configurações" route="/(tabs)/perfil" />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <ArrowBackHeader title="Configurações" route="/(tabs)/perfil" />
 
-      <SettingsToggleItem
-        label="Modo escuro"
-        value={isDark}
-        onValueChange={toggleTheme}
-        isDark={isDark}
-      />
-
-      {ConfigsOptionsList.map((item) => (
-        <ConfigButton
-          key={item.text}
-          text={item.text}
-          onPress={() => router.replace(item.router)}
+        <SettingsToggleItem
+          label="Modo escuro"
+          value={isDark}
+          onValueChange={toggleTheme}
           isDark={isDark}
         />
-      ))}
 
-      <SettingsActionButton
-        label="Excluir conta"
-        isDark={isDark}
-        variant="danger"
-        onPress={() => setDeleteModalVisible(true)}
-      />
+        {ConfigsOptionsList.map((item) => (
+          <ConfigButton
+            key={item.text}
+            text={item.text}
+            onPress={() => router.replace(item.router)}
+            isDark={isDark}
+          />
+        ))}
 
-      <SettingsActionButton
-        label="Sair"
-        isDark={isDark}
-        variant="danger"
-        onPress={handleLogout}
-      />
+        <SettingsActionButton
+          label="Excluir conta"
+          isDark={isDark}
+          variant="danger"
+          onPress={() => setDeleteModalVisible(true)}
+        />
 
-      <DeleteAccountModal
-        visible={deleteModalVisible}
-        isDark={isDark}
-        loading={deletingAccount}
-        onConfirm={handleConfirmDeleteAccount}
-        onCancel={() => setDeleteModalVisible(false)}
-      />
+        <SettingsActionButton
+          label="Sair"
+          isDark={isDark}
+          variant="danger"
+          onPress={handleLogout}
+        />
+
+        <DeleteAccountModal
+          visible={deleteModalVisible}
+          isDark={isDark}
+          loading={deletingAccount}
+          onConfirm={handleConfirmDeleteAccount}
+          onCancel={() => setDeleteModalVisible(false)}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 }
