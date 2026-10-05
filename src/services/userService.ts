@@ -10,8 +10,8 @@ export const registerUser = async (user: User) => {
       password: user.getPassword(),
     });
 
-    if (response.status === 201) {
-      alert("Usuário cadastrado com sucesso!");
+    if (response.status === 202) {
+      alert("Verifique seu e-mail para confirmar a criação da conta.");
       router.replace("/signIn");
     }
   } catch (error) {

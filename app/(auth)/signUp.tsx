@@ -4,7 +4,7 @@ import { getSignStyles } from "@/src/components/styles/stylesSign";
 import { useTheme } from "@/src/context/ThemeContext";
 import { api } from "@/src/services/api";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Alert, View } from "react-native";
 
 export default function SignUp() {
@@ -29,8 +29,8 @@ export default function SignUp() {
       return;
     }
 
-    if (password.length < 6) {
-      Alert.alert("Erro", "Senha muito curta! Mínimo de 6 caracteres.");
+    if (password.length < 8) {
+      Alert.alert("Erro", "Senha muito curta! Mínimo de 8 caracteres.");
       return;
     }
 
@@ -40,8 +40,11 @@ export default function SignUp() {
         password,
       });
 
-      if (response.status === 201) {
-        Alert.alert("Sucesso", "Usuário cadastrado!");
+      if (response.status === 202) {
+        Alert.alert(
+          "Verifique seu e-mail",
+          response.data.message ?? "Enviamos um link para confirmar seu endereço de e-mail.",
+        );
 
         router.replace("/signIn");
       }
