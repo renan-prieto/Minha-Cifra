@@ -6,11 +6,14 @@ Copie `.env.example` para `.env` e preencha as credenciais do banco e de um serv
 
 Antes de iniciar uma versao existente do banco, aplique uma vez a migracao `migrations/001_email_verification.sql`. Ela mantem os usuarios atuais confirmados e exige confirmacao para novos cadastros. A migracao cria uma restricao unica para e-mail; se houver enderecos duplicados, resolva-os antes de aplica-la.
 
+Para habilitar a redefinicao de senha por e-mail, aplique tambem uma vez a migracao `migrations/002_password_reset.sql`.
+
 ```sh
 set -a
 . ./.env
 set +a
 mysql -h "$DB_HOST" -u "$DB_USER" -p "$DB_NAME" < migrations/001_email_verification.sql
+mysql -h "$DB_HOST" -u "$DB_USER" -p "$DB_NAME" < migrations/002_password_reset.sql
 npm start
 ```
 

@@ -49,6 +49,13 @@ const verificationLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const passwordResetLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+});
+
 const normalizeEmail = (email) =>
   typeof email === "string" ? email.trim().toLowerCase() : "";
 
@@ -92,6 +99,41 @@ const sendVerificationEmail = async (email, token) => {
     subject: "Confirme seu e-mail - Minha Cifra",
     text: `Para confirmar seu e-mail, abra este link e confirme a solicitação: ${verificationUrl.toString()}\nO link expira em 24 horas.`,
     html: `<!doctype html><html lang="pt-BR"><body><p>Confirme seu endereço de e-mail para ativar sua conta no Minha Cifra.</p><p><a href="${verificationUrl.toString()}">Revisar confirmação de e-mail</a></p><p>O link expira em 24 horas. Se você não solicitou a criação da conta, ignore esta mensagem.</p></body></html>`,
+  });
+};
+
+const sendPasswordResetEmail = async (email, token) => {
+  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, EMAIL_FROM, PUBLIC_API_URL } = process.env;
+
+  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASSWORD || !EMAIL_FROM || !PUBLIC_API_URL) {
+    throw new Error("Configuração de e-mail incompleta.");
+  }
+
+  const apiUrl = new URL(PUBLIC_API_URL);
+  const isLocalHttp =
+    apiUrl.protocol === "http:" && ["localhost", "127.0.0.1"].includes(apiUrl.hostname);
+
+  if (apiUrl.protocol !== "https:" && !isLocalHttp) {
+    throw new Error("PUBLIC_API_URL deve usar HTTPS fora do ambiente local.");
+  }
+
+  const resetUrl = new URL("/reset-password", apiUrl);
+  resetUrl.searchParams.set("token", token);
+
+  const transporter = nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: Number(SMTP_PORT),
+    secure: Number(SMTP_PORT) === 465,
+    auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+    tls: { minVersion: "TLSv1.2" },
+  });
+
+  await transporter.sendMail({
+    from: EMAIL_FROM,
+    to: email,
+    subject: "Redefina sua senha - Minha Cifra",
+    text: `Para criar uma nova senha, abra este link: ${resetUrl.toString()}\nO link expira em 1 hora. Se você não solicitou a redefinição, ignore esta mensagem.`,
+    html: `<!doctype html><html lang="pt-BR"><body><p>Recebemos uma solicitação para redefinir sua senha do Minha Cifra.</p><p><a href="${resetUrl.toString()}">Criar nova senha</a></p><p>O link expira em 1 hora. Se você não solicitou a redefinição, ignore esta mensagem.</p></body></html>`,
   });
 };
 
@@ -268,6 +310,109 @@ app.post("/verify-email", verificationLimiter, async (req, res) => {
   } catch (error) {
     console.error("Erro ao confirmar e-mail:", error.message);
     return res.status(500).type("html").send("<p>Não foi possível confirmar o e-mail agora.</p>");
+  }
+});
+
+const passwordResetResponse = {
+  message: "Se houver uma conta ativa para esse endereço, enviaremos um link para redefinir a senha.",
+};
+
+app.post("/request-password-reset", passwordResetLimiter, async (req, res) => {
+  const email = normalizeEmail(req.body?.email);
+
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: "Informe um e-mail válido." });
+  }
+
+  try {
+    const user = await db("Users")
+      .select("pk_users_id")
+      .where({ email, email_verified: 1 })
+      .first();
+
+    if (user) {
+      const token = createVerificationToken();
+      await db("Users").where({ pk_users_id: user.pk_users_id }).update({
+        password_reset_token_hash: hashVerificationToken(token),
+        password_reset_expires_at: db.raw("DATE_ADD(NOW(), INTERVAL 1 HOUR)"),
+      });
+
+      try {
+        await sendPasswordResetEmail(email, token);
+      } catch (error) {
+        console.error(
+          "Falha ao enviar redefinição de senha:",
+          error.code || "SMTP_ERROR",
+          error.message,
+        );
+        await db("Users").where({ pk_users_id: user.pk_users_id }).update({
+          password_reset_token_hash: null,
+          password_reset_expires_at: null,
+        });
+      }
+    }
+
+    return res.status(202).json(passwordResetResponse);
+  } catch (error) {
+    console.error("Erro ao solicitar redefinição de senha:", error.code || "UNKNOWN");
+    return res.status(503).json({ error: "Não foi possível processar a solicitação agora." });
+  }
+});
+
+app.get("/reset-password", passwordResetLimiter, (req, res) => {
+  const token = req.query.token;
+
+  if (typeof token !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(token)) {
+    return res.status(400).type("html").send("<p>Link de redefinição inválido ou expirado.</p>");
+  }
+
+  res.set("Cache-Control", "no-store");
+  res.set("Referrer-Policy", "no-referrer");
+  res.set("Content-Security-Policy", "default-src 'none'; form-action 'self'; style-src 'unsafe-inline'");
+  return res.type("html").send(`<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="referrer" content="no-referrer"><title>Redefinir senha</title><body><main><h1>Redefinir senha</h1><form method="post" action="/reset-password"><input type="hidden" name="token" value="${token}"><label for="password">Nova senha</label><input id="password" name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" required><button type="submit">Salvar nova senha</button></form><p>A senha deve ter ao menos 8 caracteres.</p></main></body></html>`);
+});
+
+app.post("/reset-password", passwordResetLimiter, async (req, res) => {
+  const token = req.body?.token;
+  const password = req.body?.password;
+
+  if (typeof token !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(token)) {
+    return res.status(400).type("html").send("<p>Link de redefinição inválido ou expirado.</p>");
+  }
+
+  if (typeof password !== "string" || password.length < 8 || Buffer.byteLength(password, "utf8") > 72) {
+    return res.status(400).type("html").send("<p>A senha deve ter ao menos 8 caracteres e no máximo 72 bytes. Volte e tente novamente.</p>");
+  }
+
+  try {
+    const user = await db("Users")
+      .select("pk_users_id")
+      .where({ password_reset_token_hash: hashVerificationToken(token) })
+      .where("password_reset_expires_at", ">", db.fn.now())
+      .first();
+
+    if (!user) {
+      return res.status(400).type("html").send("<p>Link de redefinição inválido ou expirado.</p>");
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    const affectedRows = await db("Users")
+      .where({ pk_users_id: user.pk_users_id, password_reset_token_hash: hashVerificationToken(token) })
+      .where("password_reset_expires_at", ">", db.fn.now())
+      .update({
+        password: passwordHash,
+        password_reset_token_hash: null,
+        password_reset_expires_at: null,
+      });
+
+    if (affectedRows !== 1) {
+      return res.status(400).type("html").send("<p>Link de redefinição inválido ou expirado.</p>");
+    }
+
+    return res.status(200).type("html").send("<p>Senha atualizada. Você já pode entrar no Minha Cifra com a nova senha.</p>");
+  } catch (error) {
+    console.error("Erro ao redefinir senha:", error.code || "UNKNOWN");
+    return res.status(500).type("html").send("<p>Não foi possível atualizar a senha agora.</p>");
   }
 });
 

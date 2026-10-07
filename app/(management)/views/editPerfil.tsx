@@ -5,7 +5,6 @@ import { useTheme } from "@/src/context/ThemeContext";
 import { useUser } from "@/src/context/UserContext";
 import { useProfileActions } from "@/src/hooks/useProfileActions";
 import { router } from "expo-router";
-import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -19,7 +18,12 @@ export default function EditProfileScreen() {
     {
       label: "Nome",
       value: user?.name ?? "Editar nome",
-      route: "/(management)/views/editName" as const,
+      route: "/(management)/views/edit/editName" as const,
+    },
+    {
+      label: "Senha",
+      value: "Redefinir por e-mail",
+      route: "/(management)/views/edit/editPassword" as const,
     },
   ];
 

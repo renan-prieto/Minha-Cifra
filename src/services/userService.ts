@@ -55,6 +55,11 @@ export const updateUserName = async (userId: string, name: string) => {
   }
 };
 
+export const requestPasswordReset = async (email: string) => {
+  const response = await api.post("/request-password-reset", { email });
+  return response.data;
+};
+
 export const deleteUser = async (userId: string, password: string) => {
   try {
     const response = await api.delete(`/user/${userId}`, {
