@@ -18,6 +18,21 @@ export default function SignUp() {
 
   const router = useRouter();
 
+  async function handleResendVerification() {
+    try {
+      const response = await api.post("/resend-verification", { email });
+      Alert.alert(
+        "Verifique seu e-mail",
+        response.data.message ?? "Solicitação de reenvio realizada.",
+      );
+    } catch (error: any) {
+      Alert.alert(
+        "Falha no envio",
+        error.response?.data?.error ?? "Não foi possível reenviar o e-mail agora.",
+      );
+    }
+  }
+
   async function handleRegister() {
     if (!email || !password || !confirmPassword) {
       Alert.alert("Erro", "Preencha todos os campos!");
@@ -51,6 +66,17 @@ export default function SignUp() {
     } catch (error: any) {
       const msg =
         error.response?.data?.error ?? "Erro ao conectar com o servidor";
+
+      if (error.response?.data?.code === "EMAIL_SEND_FAILED") {
+        Alert.alert("Cadastro criado", msg, [
+          { text: "Agora não", style: "cancel" },
+          {
+            text: "Reenviar confirmação",
+            onPress: () => void handleResendVerification(),
+          },
+        ]);
+        return;
+      }
 
       Alert.alert("Erro no Cadastro", msg);
     }

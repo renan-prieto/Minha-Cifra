@@ -95,6 +95,20 @@ const sendVerificationEmail = async (email, token) => {
   });
 };
 
+const issueVerificationEmail = async (userId, email) => {
+  const token = createVerificationToken();
+  const updatedRows = await db("Users")
+    .where({ pk_users_id: userId, email_verified: 0 })
+    .update({
+      email_verification_token_hash: hashVerificationToken(token),
+      email_verification_expires_at: db.raw("DATE_ADD(NOW(), INTERVAL 24 HOUR)"),
+    });
+
+  if (updatedRows === 1) {
+    await sendVerificationEmail(email, token);
+  }
+};
+
 const genericRegistrationResponse = {
   message: "Se o endereço puder ser cadastrado, enviaremos um link de confirmação.",
 };
@@ -130,6 +144,27 @@ app.post("/register", registrationLimiter, async (req, res) => {
       });
     } catch (error) {
       if (error.code === "ER_DUP_ENTRY") {
+        const existingUser = await db("Users")
+          .select("pk_users_id", "email_verified")
+          .where({ email })
+          .first();
+
+        if (existingUser && !existingUser.email_verified) {
+          try {
+            await issueVerificationEmail(existingUser.pk_users_id, email);
+          } catch (emailError) {
+            console.error(
+              "Falha ao reenviar confirmação de cadastro:",
+              emailError.code || "SMTP_ERROR",
+              emailError.message,
+            );
+            return res.status(503).json({
+              error: "A conta foi criada, mas não foi possível enviar o e-mail de confirmação. Tente reenviar.",
+              code: "EMAIL_SEND_FAILED",
+            });
+          }
+        }
+
         return res.status(202).json(genericRegistrationResponse);
       }
       throw error;
@@ -138,7 +173,15 @@ app.post("/register", registrationLimiter, async (req, res) => {
     try {
       await sendVerificationEmail(email, token);
     } catch (error) {
-      console.error("Falha ao enviar confirmação de cadastro:", error.code || "SMTP_ERROR");
+      console.error(
+        "Falha ao enviar confirmação de cadastro:",
+        error.code || "SMTP_ERROR",
+        error.message,
+      );
+      return res.status(503).json({
+        error: "A conta foi criada, mas não foi possível enviar o e-mail de confirmação. Tente reenviar.",
+        code: "EMAIL_SEND_FAILED",
+      });
     }
 
     return res.status(202).json(genericRegistrationResponse);
@@ -162,17 +205,18 @@ app.post("/resend-verification", resendLimiter, async (req, res) => {
       .first();
 
     if (user && !user.email_verified) {
-      const token = createVerificationToken();
-      await db("Users")
-        .where({ pk_users_id: user.pk_users_id, email_verified: 0 })
-        .update({
-          email_verification_token_hash: hashVerificationToken(token),
-          email_verification_expires_at: db.raw("DATE_ADD(NOW(), INTERVAL 24 HOUR)"),
-        });
       try {
-        await sendVerificationEmail(email, token);
+        await issueVerificationEmail(user.pk_users_id, email);
       } catch (error) {
-        console.error("Falha ao reenviar confirmação:", error.code || "SMTP_ERROR");
+        console.error(
+          "Falha ao reenviar confirmação:",
+          error.code || "SMTP_ERROR",
+          error.message,
+        );
+        return res.status(503).json({
+          error: "Não foi possível enviar o e-mail de confirmação. Tente novamente mais tarde.",
+          code: "EMAIL_SEND_FAILED",
+        });
       }
     }
 
