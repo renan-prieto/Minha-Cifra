@@ -31,11 +31,13 @@ export function useCalculator(taxes: Record<TaxKey, boolean>) {
 
     return Number(calculado.toFixed(2));
   };
+ 
 
   const calculateImposto = (
     salarioBruto: number,
     inssValue: number,
-  ): number => {
+  ): number => 
+    {
     const baseOriginal = salarioBruto - inssValue;
     let baseCalculo = baseOriginal;
     let impostoCalculado = 0;
@@ -60,7 +62,7 @@ export function useCalculator(taxes: Record<TaxKey, boolean>) {
     }
 
     if (baseOriginal <= 7350) {
-      descontoCalculado = 978.62 - 0.133145 * baseOriginal;
+      descontoCalculado = 978.62 - 0.133145 * salarioBruto;
       impostoCalculado = Math.max(0, impostoCalculado - descontoCalculado);
       setDesconto(Number(descontoCalculado.toFixed(2)));
     }

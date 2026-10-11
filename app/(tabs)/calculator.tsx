@@ -35,7 +35,7 @@ export default function Calculator() {
         showsVerticalScrollIndicator={false}
       >
         <Header
-          title="Calculadora de Imposto de Renda"
+          title="Calculadora de Imposto de Renda Mensal"
           subtitle="Calcule seus descontos e veja seu salário líquido"
         />
 

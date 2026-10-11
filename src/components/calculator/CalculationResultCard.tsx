@@ -41,7 +41,7 @@ export default function CalculationResultCard({
 
   return (
     <View style={styles.resultCard}>
-      <Text style={styles.resultTitle}>Resultado do cálculo</Text>
+      <Text style={styles.resultTitle}>Resultado do cálculo aproximado</Text>
 
       <View style={styles.resultItem}>
         <Text style={styles.resultLabel}>Salário Bruto</Text>
