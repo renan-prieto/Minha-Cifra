@@ -2,13 +2,14 @@ import {
   ButtonAjusteDespesas,
   ButtonAjusteSaldo,
 } from "@/src/components/common/buttons";
+import { AiChat } from "@/src/components/common/iabox";
 import HomeHeader from "@/src/components/index/HomeHeader";
 import WalletCard from "@/src/components/index/WalletCard";
 import { getHomeStyles } from "@/src/components/styles/stylesHome";
 import { useFinance } from "@/src/context/FinanceContext";
 import { useTheme } from "@/src/context/ThemeContext";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -44,7 +45,11 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <HomeHeader styles={styles} />
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>Saldo Total</Text>
           <Text style={styles.balanceValue}>
@@ -121,6 +126,9 @@ export default function HomeScreen() {
           <Text style={styles.buttonText}>Gerenciar Carteiras</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <AiChat />
+
     </SafeAreaView>
   );
 }

@@ -32,6 +32,9 @@ export const getHomeStyles = (isDark: boolean) =>
       borderTopLeftRadius: 45,
       padding: 20,
     },
+    contentContainer: {
+      paddingBottom: 88,
+    },
     balanceCard: {
       width: "100%",
       backgroundColor: isDark ? "#101E36" : "#F7F9FC",
@@ -52,6 +55,48 @@ export const getHomeStyles = (isDark: boolean) =>
       fontSize: 30,
       fontWeight: "900",
       flexShrink: 1,
+    },
+    chatEntryCard: {
+      position: "absolute",
+      right: 18,
+      bottom: 16,
+      minHeight: 62,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingHorizontal: 12,
+      paddingVertical: 9,
+      borderRadius: 18,
+      backgroundColor: isDark ? "#101E36" : "#FFFFFF",
+      zIndex: 10,
+      ...Platform.select({
+        ios: {
+          shadowColor: "#000",
+          shadowOpacity: 0.2,
+          shadowRadius: 12,
+          shadowOffset: { width: 0, height: 5 },
+        },
+        android: { elevation: 8 },
+      }),
+    },
+    chatEntryIcon: {
+      width: 42,
+      height: 42,
+      borderRadius: 13,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: isDark ? "#2563EB" : "#006BFF",
+    },
+    chatEntryCopy: { gap: 2 },
+    chatEntryTitle: {
+      color: isDark ? "#FFFFFF" : "#001B44",
+      fontSize: 14,
+      fontWeight: "800",
+    },
+    chatEntryDescription: {
+      color: isDark ? "#AEBBD0" : "#6B7280",
+      fontSize: 11,
+      lineHeight: 15,
     },
     card: {
       backgroundColor: isDark ? "#122746" : "#FFFFFF",

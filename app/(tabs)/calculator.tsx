@@ -1,6 +1,7 @@
 import CalculationResultCard from "@/src/components/calculator/CalculationResultCard";
 import SalaryInputCard from "@/src/components/calculator/SalaryInputCard";
 import { Header } from "@/src/components/common/header";
+import { AiChat } from "@/src/components/common/iabox";
 import { getCalcStyles } from "@/src/components/styles/stylesCalc";
 import { useTaxSettings } from "@/src/context/TaxSettingsContext";
 import { useTheme } from "@/src/context/ThemeContext";
@@ -77,6 +78,8 @@ export default function Calculator() {
           showIncomeTax={taxes.irrf}
         />
       </ScrollView>
+      <AiChat />
+      
     </SafeAreaView>
   );
 }

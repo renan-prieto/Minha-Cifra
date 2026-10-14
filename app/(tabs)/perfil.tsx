@@ -1,8 +1,8 @@
-import React from "react";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Header } from "@/src/components/common/header";
+import { AiChat } from "@/src/components/common/iabox";
 import AccountInfoCard from "@/src/components/profile/AccountInfoCard";
 import ProfileCard from "@/src/components/profile/ProfileCard";
 import ProfileSettingsButton from "@/src/components/profile/ProfileSettingsButton";
@@ -46,6 +46,7 @@ export default function PerfilScreen() {
 
         <AccountInfoCard isDark={isDark} email={user?.email} />
       </ScrollView>
+      <AiChat />
     </SafeAreaView>
   );
 }

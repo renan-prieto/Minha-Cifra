@@ -1,4 +1,5 @@
 import { Header } from "@/src/components/common/header";
+import { AiChat } from "@/src/components/common/iabox";
 import BalanceCard from "@/src/components/graphs/BalanceCard";
 import { GraphBarLayout } from "@/src/components/graphs/GraphBarLayout";
 import { GraphPieLayout } from "@/src/components/graphs/GraphPieLayout";
@@ -103,6 +104,8 @@ export default function FinancialDashboard() {
           <GraphPieLayout data={pizzaData} />
         )}
       </ScrollView>
+      <AiChat />
+      
     </SafeAreaView>
   );
 }

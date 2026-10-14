@@ -1,3 +1,4 @@
+import { AiChat } from "@/src/components/common/iabox";
 import AddTagModal from "@/src/components/modal/tagModal";
 import NewReleaseHeader from "@/src/components/newRelease/NewReleaseHeader";
 import ReleaseForm from "@/src/components/newRelease/ReleaseForm";
@@ -9,7 +10,7 @@ import {
   ReleaseType,
   useNewReleaseActions,
 } from "@/src/hooks/useNewReleaseActions";
-import React, { useState } from "react";
+import { useState } from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -89,6 +90,8 @@ export default function NewReleaseScreen() {
         onClose={() => setIsModalVisible(false)}
         onAddTag={handleAddTag}
       />
+      <AiChat />
+      
     </SafeAreaView>
   );
 }
