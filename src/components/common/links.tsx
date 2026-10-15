@@ -1,29 +1,68 @@
-import React from "react";
-import { Text, TouchableOpacity, View, useColorScheme } from "react-native";
 import { useTheme } from "@/src/context/ThemeContext";
+import React, { useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 
+import { POLITICAS, TERMOS_DE_USO } from "@/src/constants/strings";
+import { Checkbox } from 'expo-checkbox';
+import { default as RulesModal } from "../modal/rulesModal";
 import { getSignStyles } from "../styles/stylesSign";
 
 interface LinkLabelProps {
   onPress: () => void;
 }
 
-export const LinkTermos: React.FC<LinkLabelProps> = ({ onPress }) => {
+interface LinkTermosProps {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+}
+
+export const LinkTermos: React.FC<LinkTermosProps> = ({
+  checked,
+  onCheckedChange,
+}) => {
   const { isDark } = useTheme();
   const styles = getSignStyles(isDark);
-
+  const [termsVisible, setTermsVisible] = useState(false);
+  const [policesVisible, setPolicesVisible] = useState(false);
+  
   return (
     <View style={styles.linkContainer}>
+      <Checkbox value={checked} onValueChange={onCheckedChange} />
       <Text style={styles.label}>
-        Ao criar sua conta, você concorda com nossos
+        Eu li e concordo com os
       </Text>
-      <TouchableOpacity onPress={onPress}>
+      <TouchableOpacity onPress={() => setTermsVisible(true)}>
         <Text style={styles.link}>TERMOS DE USO</Text>
       </TouchableOpacity>
+
+
       <Text style={styles.label}>&</Text>
-      <TouchableOpacity onPress={onPress}>
+      <TouchableOpacity onPress={() => setPolicesVisible(true)}>
         <Text style={styles.link}>POLÍTICAS DE PRIVACIDADE</Text>
       </TouchableOpacity>
+
+      {termsVisible && (
+        <RulesModal
+          visible={termsVisible}
+          isDark={isDark}
+          title="Termos de uso"
+          ruleText={TERMOS_DE_USO.text}
+          onCancel={() => setTermsVisible(false)}
+        />
+      )}
+      {policesVisible && (
+        <RulesModal
+          visible={policesVisible}
+          isDark={isDark}
+          title="Política de privacidade"
+          ruleText={POLITICAS.text}
+          onCancel={() => setPolicesVisible(false)}
+        />
+      )}
+
+
+
+      
     </View>
   );
 };

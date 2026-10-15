@@ -1,5 +1,4 @@
 import { useRouter } from "expo-router";
-import React from "react";
 import { View } from "react-native";
 
 import {
@@ -23,6 +22,8 @@ interface Props {
   setEmail: (text: string) => void;
   setPassword: (text: string) => void;
   setConfirmPassword: (text: string) => void;
+  acceptedTerms: boolean;
+  setAcceptedTerms: (accepted: boolean) => void;
 
   onRegister: () => void;
 }
@@ -35,6 +36,8 @@ export default function RegisterForm({
   setEmail,
   setPassword,
   setConfirmPassword,
+  acceptedTerms,
+  setAcceptedTerms,
   onRegister,
 }: Props) {
   const styles = getSignStyles(isDark);
@@ -53,8 +56,11 @@ export default function RegisterForm({
 
       <ButtonSignUp onPress={onRegister} />
 
-      <LinkTermos onPress={() => router.replace("/(tabs)")} />
-
+      <LinkTermos
+        checked={acceptedTerms}
+        onCheckedChange={setAcceptedTerms}
+      />
+      
       <DivisorLabel />
 
       <LinkPossui onPress={() => router.replace("/signIn")} />

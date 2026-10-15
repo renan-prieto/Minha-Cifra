@@ -1,6 +1,5 @@
 export const TERMOS_DE_USO = {
-  text: `
-    1. Termos de Uso
+  text: `1. Termos de Uso
     1.1 Introdução 
 
     Estes Termos de Uso estabelecem as condições para utilização do aplicativo MinhaCifra.
@@ -107,8 +106,7 @@ export const TERMOS_DE_USO = {
 } as const;
 
 export const POLITICAS = {
-  text: `
-    1. Introdução
+  text: `1. Introdução
 
     O MinhaCifra valoriza a privacidade e a segurança das informações de seus usuários. Esta Política
     de Privacidade foi elaborada para explicar, de forma clara e transparente, como os dados pessoais
@@ -218,7 +216,13 @@ export const POLITICAS = {
 } as const;
 
 export const SOBREAPP = {
-  text: "",
+  text: `SOBRE O APLICATIVO
+
+Minha Cifra surgiu com o objetivo de facilitar a organização financeira pessoal, considerando as dificuldades que muitas pessoas enfrentam para controlar seus gastos, planejar seu orçamento e compreender questões relacionadas ao Imposto de Renda. A falta de organização financeira e a dificuldade em entender quais informações são necessárias para calcular os tributos podem gerar dúvidas, insegurança e dificuldades no planejamento do dinheiro.
+
+Pensando nisso, desenvolvemos Minha Cifra, uma plataforma que reúne ferramentas de gestão financeira, cálculo do Imposto de Renda da Pessoa Física (IRPF) e suporte por Inteligência Artificial. O aplicativo permite organizar receitas e despesas, acompanhar informações financeiras e visualizar melhor a própria situação econômica. Já a Inteligência Artificial, implementada no site, oferece suporte aos usuários, auxiliando na compreensão de dúvidas e na utilização dos recursos disponíveis.
+
+A escolha do cálculo do Imposto de Renda como uma das funcionalidades principais surgiu da necessidade de tornar esse processo mais acessível e compreensível, considerando as dúvidas que contribuintes podem ter sobre rendimentos, deduções, valores a pagar e possíveis restituições. Dessa forma,  Minha Cifra busca centralizar recursos importantes em um único ambiente, oferecendo mais praticidade, organização e autonomia para que os usuários possam cuidar melhor de sua vida financeira.`,
 } as const;
 
 export const SOBRENOS = {

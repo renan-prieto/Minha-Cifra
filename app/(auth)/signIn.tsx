@@ -14,11 +14,17 @@ export default function SignIn() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const { signIn } = useUser();
 
   const styles = getSignStyles(isDark);
 
   async function handleLogin() {
+    if (!acceptedTerms) {
+      Alert.alert("Atenção", "Aceite os termos de uso e a política de privacidade para entrar.");
+      return;
+    }
+
     if (!email || !password) {
       Alert.alert("Erro", "Preencha todos os campos.");
       return;
@@ -73,6 +79,8 @@ export default function SignIn() {
         password={password}
         setEmail={setEmail}
         setPassword={setPassword}
+        acceptedTerms={acceptedTerms}
+        setAcceptedTerms={setAcceptedTerms}
         onLogin={handleLogin}
       />
     </View>

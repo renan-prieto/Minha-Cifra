@@ -13,6 +13,7 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const styles = getSignStyles(isDark);
 
@@ -34,6 +35,11 @@ export default function SignUp() {
   }
 
   async function handleRegister() {
+    if (!acceptedTerms) {
+      Alert.alert("Atenção", "Aceite os termos de uso e a política de privacidade para continuar.");
+      return;
+    }
+
     if (!email || !password || !confirmPassword) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
@@ -94,6 +100,8 @@ export default function SignUp() {
         setEmail={setEmail}
         setPassword={setPassword}
         setConfirmPassword={setConfirmPassword}
+        acceptedTerms={acceptedTerms}
+        setAcceptedTerms={setAcceptedTerms}
         onRegister={handleRegister}
       />
     </View>
