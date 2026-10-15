@@ -2,18 +2,19 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+	KeyboardAvoidingView,
+	Platform,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "@/src/context/ThemeContext";
+import { sendChatMessage } from "../../src/services/chatService";
 
 type Message = {
 	id: number;
@@ -27,38 +28,13 @@ const suggestions = [
 	"O que é uma reserva de emergência?",
 ];
 
-function getDemoReply(message: string) {
-	const normalizedMessage = message.toLocaleLowerCase("pt-BR");
-
-	if (normalizedMessage.includes("reserva")) {
-		return "Uma reserva de emergência é um valor separado para imprevistos, como uma despesa médica ou um conserto. Um bom começo é guardar aos poucos até chegar a alguns meses das suas despesas essenciais. Mantenha esse dinheiro acessível e evite contar com ele para gastos planejados.";
-	}
-
-	if (
-		normalizedMessage.includes("guardar") ||
-		normalizedMessage.includes("economizar") ||
-		normalizedMessage.includes("poupar")
-	) {
-		return "Comece escolhendo um valor que caiba no seu mês, mesmo que seja pequeno. Anote seus gastos por algumas semanas, defina uma meta específica e transfira o valor para a meta assim que receber. A consistência costuma ser mais útil do que começar com um valor alto.";
-	}
-
-	if (
-		normalizedMessage.includes("orçamento") ||
-		normalizedMessage.includes("orcamento") ||
-		normalizedMessage.includes("gastos")
-	) {
-		return "Uma forma simples de começar é separar seus gastos em essenciais, variáveis e objetivos. Registre o que entra e sai, confira os totais no fim da semana e escolha um ajuste realista para o próximo mês. No MinhaCifra, você pode acompanhar suas carteiras e seu saldo pela tela inicial.";
-	}
-
-	return "Posso ajudar com ideias gerais para organizar orçamento, acompanhar gastos e criar hábitos de economia. Para uma orientação útil, conte um pouco mais sobre sua dúvida. Esta resposta é demonstrativa e não substitui orientação financeira profissional.";
-}
-
 export default function ChatScreen() {
 	const router = useRouter();
 	const { isDark } = useTheme();
 	const styles = createStyles(isDark);
 	const scrollViewRef = useRef<ScrollView>(null);
 	const nextMessageId = useRef(1);
+	const conversationId = useRef(0);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [draft, setDraft] = useState("");
 	const [isResponding, setIsResponding] = useState(false);
@@ -68,12 +44,13 @@ export default function ChatScreen() {
 	}, [messages, isResponding]);
 
 	function startNewConversation() {
+		conversationId.current += 1;
 		setMessages([]);
 		setDraft("");
 		setIsResponding(false);
 	}
 
-	function sendMessage(text = draft) {
+	async function sendMessage(text = draft) {
 		const trimmedText = text.trim();
 
 		if (!trimmedText || isResponding) return;
@@ -87,17 +64,32 @@ export default function ChatScreen() {
 		setMessages((currentMessages) => [...currentMessages, userMessage]);
 		setDraft("");
 		setIsResponding(true);
+		const activeConversationId = conversationId.current;
 
-		setTimeout(() => {
-			const assistantMessage: Message = {
-				id: nextMessageId.current++,
-				text: getDemoReply(trimmedText),
-				role: "assistant",
-			};
+		try {
+			const reply = await sendChatMessage([...messages, userMessage]);
+			if (activeConversationId !== conversationId.current) return;
 
-			setMessages((currentMessages) => [...currentMessages, assistantMessage]);
-			setIsResponding(false);
-		}, 650);
+			setMessages((currentMessages) => [
+				...currentMessages,
+				{ id: nextMessageId.current++, text: reply, role: "assistant" },
+			]);
+		} catch (error) {
+			if (activeConversationId !== conversationId.current) return;
+
+			setMessages((currentMessages) => [
+				...currentMessages,
+				{
+					id: nextMessageId.current++,
+					text: error instanceof Error ? error.message : "Não foi possível obter uma resposta agora.",
+					role: "assistant",
+				},
+			]);
+		} finally {
+			if (activeConversationId === conversationId.current) {
+				setIsResponding(false);
+			}
+		}
 	}
 
 	return (
@@ -124,7 +116,7 @@ export default function ChatScreen() {
 							<Text style={styles.headerTitle}>Assistente financeiro</Text>
 							<View style={styles.statusRow}>
 								<View style={styles.statusDot} />
-								<Text style={styles.headerSubtitle}>Respostas demonstrativas</Text>
+								<Text style={styles.headerSubtitle}>Assistente com IA</Text>
 							</View>
 						</View>
 					</View>
@@ -230,6 +222,7 @@ export default function ChatScreen() {
 							accessibilityLabel="Digite sua mensagem"
 							editable={!isResponding}
 							multiline
+							maxLength={1000}
 							onChangeText={setDraft}
 							onSubmitEditing={() => sendMessage()}
 							placeholder="Escreva sua dúvida..."

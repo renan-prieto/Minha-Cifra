@@ -4,6 +4,8 @@
 
 Copie `.env.example` para `.env` e preencha as credenciais do banco e de um servidor SMTP. Nunca versione o arquivo `.env`. Em producao, `PUBLIC_API_URL` deve usar HTTPS e apontar para a URL publica desta API.
 
+O chat usa a Gemini API. Crie uma chave no [Google AI Studio](https://aistudio.google.com/apikey) e configure `GEMINI_API_KEY` no `.env` desta pasta. O modelo padrao e `gemini-3.5-flash-lite`; ele pode ser alterado com `GEMINI_MODEL`. A chave fica apenas no servidor e nunca deve ser configurada no app Expo. O nivel gratuito possui cotas de uso, que podem variar por projeto e modelo.
+
 Antes de iniciar uma versao existente do banco, aplique uma vez a migracao `migrations/001_email_verification.sql`. Ela mantem os usuarios atuais confirmados e exige confirmacao para novos cadastros. A migracao cria uma restricao unica para e-mail; se houver enderecos duplicados, resolva-os antes de aplica-la.
 
 Para habilitar a redefinicao de senha por e-mail, aplique tambem uma vez a migracao `migrations/002_password_reset.sql`.

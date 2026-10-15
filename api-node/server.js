@@ -9,6 +9,7 @@ const nodemailer = require("nodemailer");
 const { rateLimit } = require("express-rate-limit");
 
 const app = express();
+app.use("/chat", express.json({ limit: "100kb" }));
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: false, limit: "10kb" }));
 app.use(cors());
@@ -52,6 +53,13 @@ const verificationLimiter = rateLimit({
 const passwordResetLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   limit: 5,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+});
+
+const chatLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
   standardHeaders: "draft-8",
   legacyHeaders: false,
 });
@@ -455,6 +463,89 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     console.error("Erro na rota de login:", error);
     res.status(500).json({ error: "Erro interno no servidor." });
+  }
+});
+
+app.post("/chat", chatLimiter, async (req, res) => {
+  const conversation = req.body?.messages;
+
+  if (
+    !Array.isArray(conversation) ||
+    conversation.length === 0 ||
+    conversation.length > 20 ||
+    conversation.some(
+      (message) =>
+        !message ||
+        !["user", "assistant"].includes(message.role) ||
+        typeof message.content !== "string" ||
+        !message.content.trim() ||
+        message.content.length > 1000,
+    )
+  ) {
+    return res.status(400).json({ error: "Envie uma conversa válida para continuar." });
+  }
+
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(503).json({ error: "Configure GEMINI_API_KEY no servidor para ativar o assistente." });
+  }
+
+  try {
+    const model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+    const providerResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "x-goog-api-key": process.env.GEMINI_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [
+              {
+                text: "Você é o assistente financeiro educativo do Minha Cifra. Responda em português brasileiro, com clareza e foco em educação financeira geral. Não se apresente como consultor, não prometa retornos e não recomende ativos específicos. Para decisões complexas, sugira procurar um profissional qualificado.",
+              },
+            ],
+          },
+          contents: conversation.map(({ role, content }) => ({
+            role: role === "assistant" ? "model" : "user",
+            parts: [{ text: content.trim() }],
+          })),
+          generationConfig: { maxOutputTokens: 700 },
+        }),
+        signal: AbortSignal.timeout(30000),
+      },
+    );
+
+    const providerData = await providerResponse.json().catch(() => null);
+
+    if (!providerResponse.ok) {
+      const providerError = providerData?.error || {};
+      const errorCode = providerError.status || providerError.code || "unknown";
+      console.error("Gemini respondeu com status e código:", providerResponse.status, errorCode);
+
+      if (providerResponse.status === 429) {
+        return res.status(429).json({
+          error: "A cota gratuita ou o limite de solicitações do Gemini foi atingido. Confira os limites e o uso do projeto no Google AI Studio.",
+        });
+      }
+
+      return res.status(502).json({ error: "O assistente não conseguiu responder agora. Tente novamente." });
+    }
+
+    const reply = providerData.candidates?.[0]?.content?.parts
+      ?.map((part) => part.text || "")
+      .join("")
+      .trim();
+
+    if (typeof reply !== "string" || !reply.trim()) {
+      return res.status(502).json({ error: "O assistente retornou uma resposta vazia. Tente novamente." });
+    }
+
+    return res.status(200).json({ reply: reply.trim() });
+  } catch (error) {
+    console.error("Falha ao consultar o provedor de IA:", error.name || "UNKNOWN");
+    return res.status(502).json({ error: "Não foi possível conectar ao assistente agora. Tente novamente." });
   }
 });
 
