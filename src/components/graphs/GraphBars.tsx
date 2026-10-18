@@ -1,13 +1,60 @@
+
 import { ThemedText } from "@/src/components/expo/themed-text";
-import { Alert, View } from "react-native";
-import GraphBar from "./GraphBar";
-import { BAR_COLORS } from "./colors";
 import { getBarStyles } from "@/src/components/styles/stylesBar";
 import { useTheme } from "@/src/context/ThemeContext";
+import { useEffect, useRef } from "react";
+import { Alert, Animated, View } from "react-native";
+import GraphBar from "./GraphBar";
+import { BAR_COLORS } from "./colors";
 
 interface Props {
   data: any[];
   maxValue: number;
+}
+
+function AnimatedEntry({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) {
+  const progress = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    progress.setValue(0);
+
+    const animation = Animated.sequence([
+      Animated.delay(delay),
+      Animated.timing(progress, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]);
+
+    animation.start();
+
+    return () => animation.stop();
+  }, [delay, progress]);
+
+  return (
+    <Animated.View
+      style={{
+        opacity: progress,
+        transform: [
+          {
+            translateY: progress.interpolate({
+              inputRange: [0, 1],
+              outputRange: [14, 0],
+            }),
+          },
+        ],
+      }}
+    >
+      {children}
+    </Animated.View>
+  );
 }
 
 export default function GraphBars({ data, maxValue }: Props) {
@@ -42,46 +89,55 @@ export default function GraphBars({ data, maxValue }: Props) {
 
   return (
     <View style={styles.chartContainer}>
-      {data.map((item) => (
-        <View key={`${item.month}-${item.year}`} style={styles.monthGroup}>
+      {data.map((item, groupIndex) => (
+        <View
+          key={`${item.month}-${item.year}-${item.earn}-${item.lost}-${item.investments}`}
+          style={styles.monthGroup}
+        >
           <View style={styles.barsRow}>
-            <GraphBar
-              value={item.earn}
-              maxValue={maxValue}
-              maxHeight={250}
-              barWidth={45}
-              color={BAR_COLORS.earn}
-              onPress={() =>
-                handleDetails("Ganhos", item.year, item.month, item.earn)
-              }
-            />
+            <AnimatedEntry delay={groupIndex * 120}>
+              <GraphBar
+                value={item.earn}
+                maxValue={maxValue}
+                maxHeight={250}
+                barWidth={45}
+                color={BAR_COLORS.earn}
+                onPress={() =>
+                  handleDetails("Ganhos", item.year, item.month, item.earn)
+                }
+              />
+            </AnimatedEntry>
 
-            <GraphBar
-              value={item.lost}
-              maxValue={maxValue}
-              maxHeight={250}
-              barWidth={45}
-              color={BAR_COLORS.lost}
-              onPress={() =>
-                handleDetails("Gastos", item.year, item.month, item.lost)
-              }
-            />
+            <AnimatedEntry delay={groupIndex * 120 + 90}>
+              <GraphBar
+                value={item.lost}
+                maxValue={maxValue}
+                maxHeight={250}
+                barWidth={45}
+                color={BAR_COLORS.lost}
+                onPress={() =>
+                  handleDetails("Gastos", item.year, item.month, item.lost)
+                }
+              />
+            </AnimatedEntry>
 
-            <GraphBar
-              value={item.investments}
-              maxValue={maxValue}
-              maxHeight={250}
-              barWidth={45}
-              color={BAR_COLORS.investments}
-              onPress={() =>
-                handleDetails(
-                  "Investimentos",
-                  item.year,
-                  item.month,
-                  item.investments,
-                )
-              }
-            />
+            <AnimatedEntry delay={groupIndex * 120 + 180}>
+              <GraphBar
+                value={item.investments}
+                maxValue={maxValue}
+                maxHeight={250}
+                barWidth={45}
+                color={BAR_COLORS.investments}
+                onPress={() =>
+                  handleDetails(
+                    "Investimentos",
+                    item.year,
+                    item.month,
+                    item.investments,
+                  )
+                }
+              />
+            </AnimatedEntry>
           </View>
         </View>
       ))}
