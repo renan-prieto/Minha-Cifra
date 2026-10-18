@@ -1,3 +1,4 @@
+
 import { Platform, StyleSheet } from "react-native";
 
 export const getOnboardingStyles = (isDark: boolean) =>
@@ -19,6 +20,7 @@ export const getOnboardingStyles = (isDark: boolean) =>
       alignItems: "center",
       paddingHorizontal: 24,
       paddingTop: 40,
+      marginBottom: 40,
     },
 
     logoContainer: {
