@@ -60,7 +60,7 @@ export default function RegisterForm({
         checked={acceptedTerms}
         onCheckedChange={setAcceptedTerms}
       />
-      
+
       <DivisorLabel />
 
       <LinkPossui onPress={() => router.replace("/signIn")} />

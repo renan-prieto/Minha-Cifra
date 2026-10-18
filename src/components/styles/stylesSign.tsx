@@ -178,4 +178,62 @@ export const getSignStyles = (isDark: boolean) =>
       fontWeight: "700",
       color: isDark ? "#DCEBFF" : "#64748B",
     },
+
+        termsContainer: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      paddingVertical: 14,
+      paddingHorizontal: 14,
+      marginTop: 5,
+      marginBottom: 10,
+      borderRadius: 16,
+      backgroundColor: isDark ? "#122746" : "#FFFFFF",
+      borderWidth: 1,
+      borderColor: isDark ? "#29476F" : "#D7E2F0",
+    },
+
+    checkbox: {
+      width: 23,
+      height: 23,
+      borderRadius: 7,
+      borderWidth: 2,
+      borderColor: isDark ? "#8FC5FF" : "#006BFF",
+      backgroundColor: "transparent",
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: 11,
+      marginTop: 1,
+    },
+
+    checkboxChecked: {
+      backgroundColor: isDark ? "#8FC5FF" : "#006BFF",
+      borderColor: isDark ? "#8FC5FF" : "#006BFF",
+    },
+
+    checkboxCheckmark: {
+      color: "#FFFFFF",
+      fontSize: 15,
+      fontWeight: "900",
+      lineHeight: 18,
+    },
+
+    termsTextContainer: {
+      flex: 1,
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+    },
+
+    termsText: {
+      fontSize: 13,
+      lineHeight: 21,
+      color: isDark ? "#DCEBFF" : "#475569",
+    },
+
+    termsLink: {
+      fontSize: 13,
+      lineHeight: 21,
+      fontWeight: "800",
+      color: isDark ? "#8FC5FF" : "#006BFF",
+    },
   });

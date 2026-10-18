@@ -1,14 +1,13 @@
 import { ArrowBackHeader } from "@/src/components/common/arrowBackHeader";
 import ConfigButton from "@/src/components/config/ConfigButton";
 import SettingsActionButton from "@/src/components/config/SettingsActionButton";
-import SettingsToggleItem from "@/src/components/config/SettingsToggleItem";
 import DeleteAccountModal from "@/src/components/modal/deleteAccountModal";
 import { getConfigStyles } from "@/src/components/styles/stylesConfig";
 import { useTheme } from "@/src/context/ThemeContext";
 import { useConfigurationActions } from "@/src/hooks/useConfigurationActions";
 import { Href, router } from "expo-router";
 import { useState } from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface ConfigsOptions {
@@ -60,12 +59,27 @@ export default function SettingsScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <ArrowBackHeader title="Configurações" route="/(tabs)/perfil" />
 
-        <SettingsToggleItem
-          label="Modo escuro"
-          value={isDark}
-          onValueChange={toggleTheme}
-          isDark={isDark}
-        />
+        <View
+          style={[
+            styles.item,
+            isDark && {
+              borderWidth: 1,
+              borderColor: "#8FC5FF",
+            },
+          ]}
+        >
+          <Text style={styles.text}>Modo escuro</Text>
+          <Switch
+            value={isDark}
+            onValueChange={toggleTheme}
+            trackColor={{
+              false: isDark ? "#35445B" : "#8BB5E8",
+              true: "#3B9BFF",
+            }}
+            thumbColor={isDark ? "#FFFFFF" : "#F4F8FF"}
+            ios_backgroundColor={isDark ? "#35445B" : "#8BB5E8"}
+          />
+        </View>
 
         {ConfigsOptionsList.map((item) => (
           <ConfigButton
