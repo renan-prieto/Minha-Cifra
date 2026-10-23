@@ -1,6 +1,6 @@
 import {
-  ButtonAjusteDespesas,
-  ButtonAjusteSaldo,
+    ButtonAjusteDespesas,
+    ButtonAjusteSaldo,
 } from "@/src/components/common/buttons";
 import { AiChat } from "@/src/components/common/iabox";
 import HomeHeader from "@/src/components/index/HomeHeader";
@@ -19,11 +19,11 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const {
-    itemsEarn,
+    walletItemsEarn,
     totalEarn,
     itemsInvestments,
     totalInvestments,
-    itemsLost,
+    walletItemsLost,
     totalLost,
     balance,
     addEarn,
@@ -62,7 +62,7 @@ export default function HomeScreen() {
         <WalletCard
           title="Carteira de Ganhos"
           total={totalEarn}
-          items={itemsEarn}
+          items={walletItemsEarn}
           type="earn"
           hidden={hideValues}
           styles={styles}
@@ -102,7 +102,7 @@ export default function HomeScreen() {
         <WalletCard
           title="Carteira de Gastos"
           total={totalLost}
-          items={itemsLost}
+          items={walletItemsLost}
           type="lost"
           hidden={hideValues}
           styles={styles}

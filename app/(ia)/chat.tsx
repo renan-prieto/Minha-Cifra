@@ -11,6 +11,7 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
+import Markdown, { type MarkdownProps } from "react-native-markdown-display";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "@/src/context/ThemeContext";
@@ -32,6 +33,7 @@ export default function ChatScreen() {
 	const router = useRouter();
 	const { isDark } = useTheme();
 	const styles = createStyles(isDark);
+	const markdownStyles = createMarkdownStyles(isDark);
 	const scrollViewRef = useRef<ScrollView>(null);
 	const nextMessageId = useRef(1);
 	const conversationId = useRef(0);
@@ -183,15 +185,11 @@ export default function ChatScreen() {
 												: styles.assistantMessageBubble,
 										]}
 									>
-										<Text
-											style={
-												message.role === "user"
-													? styles.userMessageText
-													: styles.assistantMessageText
-											}
-										>
-											{message.text}
-										</Text>
+										{message.role === "assistant" ? (
+											<Markdown style={markdownStyles}>{message.text}</Markdown>
+										) : (
+											<Text style={styles.userMessageText}>{message.text}</Text>
+										)}
 									</View>
 								</View>
 							))}
@@ -410,4 +408,42 @@ function createStyles(isDark: boolean) {
 		iconColor: { color: "#FFFFFF" },
 		mutedColor: { color: muted },
 	});
+}
+
+function createMarkdownStyles(isDark: boolean): NonNullable<MarkdownProps["style"]> {
+	const text = isDark ? "#FFFFFF" : "#001B44";
+	const border = isDark ? "#243653" : "#DCE3ED";
+
+	return {
+		body: { color: text, fontSize: 14, lineHeight: 21 },
+		paragraph: { marginTop: 0, marginBottom: 10 },
+		heading1: { color: text, fontSize: 19, lineHeight: 25, fontWeight: "800", marginTop: 8, marginBottom: 8 },
+		heading2: { color: text, fontSize: 17, lineHeight: 23, fontWeight: "700", marginTop: 8, marginBottom: 6 },
+		heading3: { color: text, fontSize: 15, lineHeight: 21, fontWeight: "700", marginTop: 6, marginBottom: 4 },
+		strong: { color: text, fontWeight: "800" },
+		em: { fontStyle: "italic" },
+		bullet_list: { marginTop: 2, marginBottom: 8 },
+		ordered_list: { marginTop: 2, marginBottom: 8 },
+		list_item: { marginBottom: 4 },
+		blockquote: {
+			borderLeftColor: isDark ? "#5B9BFF" : "#006BFF",
+			borderLeftWidth: 3,
+			backgroundColor: isDark ? "#172943" : "#F1F6FF",
+			paddingHorizontal: 10,
+			marginVertical: 6,
+		},
+		code_inline: {
+			color: text,
+			backgroundColor: isDark ? "#1B2B45" : "#EDF1F7",
+			fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
+		},
+		fence: {
+			color: text,
+			backgroundColor: isDark ? "#1B2B45" : "#EDF1F7",
+			fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
+			padding: 10,
+			borderRadius: 8,
+		},
+		hr: { backgroundColor: border, marginVertical: 8 },
+	};
 }

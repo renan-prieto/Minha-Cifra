@@ -8,6 +8,7 @@ import React, {
     useMemo,
     useState,
 } from "react";
+import { AppState } from "react-native";
 
 import type { FinanceType } from "@/src/services/financeDatabase";
 import {
@@ -64,12 +65,14 @@ interface NewItemFinance {
 
 interface FinanceContextData {
   itemsEarn: ItemFinance[];
+  walletItemsEarn: ItemFinance[];
   setItemsEarn: React.Dispatch<React.SetStateAction<ItemFinance[]>>;
 
   itemsInvestments: ItemFinance[];
   setItemsInvestments: React.Dispatch<React.SetStateAction<ItemFinance[]>>;
 
   itemsLost: ItemFinance[];
+  walletItemsLost: ItemFinance[];
   setItemsLost: React.Dispatch<React.SetStateAction<ItemFinance[]>>;
 
   totalEarn: number;
@@ -103,6 +106,7 @@ const FinanceContext = createContext<FinanceContextData>(
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const db = useSQLiteContext();
+  const [currentPeriod, setCurrentPeriod] = useState(getCurrentDate);
   const [itemsEarn, setItemsEarn] = useState<ItemFinance[]>([]);
 
   const [itemsInvestments, setItemsInvestments] = useState<ItemFinance[]>([]);
@@ -114,6 +118,41 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [tagsInvestments, setTagsInvestments] = useState<string[]>([]);
 
   const [tagsLost, setTagsLost] = useState<string[]>([]);
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+
+    const refreshPeriod = () => {
+      const nextPeriod = getCurrentDate();
+      setCurrentPeriod((period) =>
+        period.year === nextPeriod.year && period.month === nextPeriod.month
+          ? period
+          : nextPeriod,
+      );
+
+      const now = new Date();
+      const nextDay = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+      );
+      timeout = setTimeout(refreshPeriod, nextDay.getTime() - now.getTime());
+    };
+
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        clearTimeout(timeout);
+        refreshPeriod();
+      }
+    });
+
+    refreshPeriod();
+
+    return () => {
+      clearTimeout(timeout);
+      subscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     async function loadFinanceData() {
@@ -284,9 +323,26 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     }
   }, [db]);
 
+  const isCurrentPeriod = useCallback(
+    (item: ItemFinance) =>
+      item.year === currentPeriod.year &&
+      item.month.toLocaleLowerCase() === currentPeriod.month.toLocaleLowerCase(),
+    [currentPeriod],
+  );
+
+  const walletItemsEarn = useMemo(
+    () => itemsEarn.filter(isCurrentPeriod),
+    [itemsEarn, isCurrentPeriod],
+  );
+
+  const walletItemsLost = useMemo(
+    () => itemsLost.filter(isCurrentPeriod),
+    [itemsLost, isCurrentPeriod],
+  );
+
   const totalEarn = useMemo(
-    () => itemsEarn.reduce((acc, item) => acc + item.value, 0),
-    [itemsEarn],
+    () => walletItemsEarn.reduce((acc, item) => acc + item.value, 0),
+    [walletItemsEarn],
   );
 
   const totalInvestments = useMemo(
@@ -295,17 +351,19 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   );
 
   const totalLost = useMemo(
-    () => itemsLost.reduce((acc, item) => acc + item.value, 0),
-    [itemsLost],
+    () => walletItemsLost.reduce((acc, item) => acc + item.value, 0),
+    [walletItemsLost],
   );
 
   const balance = totalEarn - (totalLost + totalInvestments);
   const value = useMemo(() => ({
     itemsEarn,
+    walletItemsEarn,
     setItemsEarn,
     itemsInvestments,
     setItemsInvestments,
     itemsLost,
+    walletItemsLost,
     setItemsLost,
     totalEarn,
     totalInvestments,
@@ -324,8 +382,10 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     addLost,
   }), [
     itemsEarn,
+    walletItemsEarn,
     itemsInvestments,
     itemsLost,
+    walletItemsLost,
     totalEarn,
     totalInvestments,
     totalLost,

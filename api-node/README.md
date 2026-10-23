@@ -6,6 +6,8 @@ Copie `.env.example` para `.env` e preencha as credenciais do banco e de um serv
 
 O chat usa a Gemini API. Crie uma chave no [Google AI Studio](https://aistudio.google.com/apikey) e configure `GEMINI_API_KEY` no `.env` desta pasta. O modelo padrao e `gemini-3.5-flash-lite`; ele pode ser alterado com `GEMINI_MODEL`. A chave fica apenas no servidor e nunca deve ser configurada no app Expo. O nivel gratuito possui cotas de uso, que podem variar por projeto e modelo.
 
+O endpoint `/chat` recupera ate quatro trechos relevantes da base local `knowledge/financial-guidance.md` usando BM25 e os envia ao Gemini como material de referencia. Para ampliar ou corrigir o conhecimento, edite esse arquivo usando secoes Markdown iniciadas por `##`; cada paragrafo e indexado como um trecho. A recuperacao nao inclui dados pessoais do usuario e nao substitui a verificacao de regras financeiras ou tributarias atuais em fontes oficiais.
+
 Antes de iniciar uma versao existente do banco, aplique uma vez a migracao `migrations/001_email_verification.sql`. Ela mantem os usuarios atuais confirmados e exige confirmacao para novos cadastros. A migracao cria uma restricao unica para e-mail; se houver enderecos duplicados, resolva-os antes de aplica-la.
 
 Para habilitar a redefinicao de senha por e-mail, aplique tambem uma vez a migracao `migrations/002_password_reset.sql`.
