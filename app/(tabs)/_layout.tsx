@@ -1,4 +1,3 @@
-
 import * as NavigationBar from "expo-navigation-bar";
 import {
   DarkTheme,
@@ -52,20 +51,11 @@ function App({ loading, onReady }: AppProps) {
 export default function RootLayout() {
   const [databaseReady, setDatabaseReady] = useState(false);
   const [appReady, setAppReady] = useState(false);
-  const [animationFinished, setAnimationFinished] = useState(false);
 
-  const loading = !(
-    databaseReady &&
-    appReady &&
-    animationFinished
-  );
+  const loading = !(databaseReady && appReady);
 
   const handleAppReady = useCallback(() => {
     setAppReady(true);
-  }, []);
-
-  const handleAnimationFinished = useCallback(() => {
-    setAnimationFinished(true);
   }, []);
 
   const handleDatabaseInit = useCallback(async (db: any) => {
@@ -98,11 +88,7 @@ export default function RootLayout() {
           </TaxSettingsProvider>
         </UserProvider>
 
-        {loading && (
-          <LoadingSplash
-            onAnimationFinished={handleAnimationFinished}
-          />
-        )}
+        {loading && <LoadingSplash />}
       </View>
     </SQLiteProvider>
   );
