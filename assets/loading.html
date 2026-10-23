@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <title>Minha Cifra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --navy: #06173D;
+      --deep: #0B2A72;
+      --royal: #1D5BFF;
+      --sky: #7DB6FF;
+      --ice: #EAF2FF;
+      box-sizing: border-box;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--navy);
+    }
+
+    body {
+      color: var(--ice);
+      font-family: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .splash {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px));
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 50%, rgba(29, 91, 255, .45), transparent 70%),
+        var(--navy);
+    }
+
+    .pill {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 10px;
+      padding: 9px 18px;
+      border: 1px solid rgba(125, 182, 255, .35);
+      border-radius: 99px;
+      font-size: 14px;
+      color: var(--sky);
+      white-space: nowrap;
+      animation: fade .6s .1s both;
+    }
+
+    .pill b {
+      font-size: 20px;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stage {
+      display: block;
+      width: min(92vw, 460px);
+      max-height: 55vh;
+      overflow: visible;
+    }
+
+    .bar {
+      fill: url(#bg);
+      transform-box: fill-box;
+      transform-origin: bottom;
+    }
+
+    .coin {
+      fill: var(--sky);
+    }
+
+    .coin2 {
+      fill: none;
+      stroke: var(--deep);
+      stroke-width: 2.5;
+    }
+
+    .line {
+      fill: none;
+      stroke: #fff;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    .base {
+      stroke: rgba(125, 182, 255, .4);
+      stroke-width: 2;
+    }
+
+    .play .bar {
+      animation: grow 1.5s calc(.3s + var(--i) * .12s) cubic-bezier(.3, .8, .3, 1) both;
+    }
+
+    .play .coin-g {
+      animation: rise 1.5s calc(.3s + var(--i) * .12s) cubic-bezier(.3, .8, .3, 1) both;
+    }
+
+    .play .line {
+      animation: draw .7s 1.8s ease-out both;
+    }
+
+    @keyframes grow {
+      0%, 22% {
+        transform: scaleY(0);
+      }
+      100% {
+        transform: scaleY(1);
+      }
+    }
+
+    @keyframes rise {
+      0% {
+        transform: translateY(-300px);
+        opacity: 0;
+      }
+      12% {
+        opacity: 1;
+      }
+      22% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(calc(var(--h) * -1px));
+      }
+    }
+
+    @keyframes draw {
+      from {
+        stroke-dashoffset: 1;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .splash {
+        gap: 12px;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .pill {
+        gap: 7px;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+
+      .pill b {
+        font-size: 18px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .play * {
+        animation-duration: .01s !important;
+        animation-delay: 0s !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="splash" id="s">
+    <div class="pill">
+      <span>Restituição estimada</span>
+      <b id="amt">R$ 0</b>
+    </div>
+
+    <svg class="stage" viewBox="20 90 360 230" role="img" aria-label="Gráfico financeiro animado">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#4F8CFF"/>
+          <stop offset="1" stop-color="#0B2A72"/>
+        </linearGradient>
+      </defs>
+
+      <line class="base" x1="40" y1="300" x2="360" y2="300"/>
+
+      <rect class="bar" style="--i:0" x="62" y="240" width="36" height="60" rx="6"/>
+      <rect class="bar" style="--i:1" x="122" y="205" width="36" height="95" rx="6"/>
+      <rect class="bar" style="--i:2" x="182" y="220" width="36" height="80" rx="6"/>
+      <rect class="bar" style="--i:3" x="242" y="170" width="36" height="130" rx="6"/>
+      <rect class="bar" style="--i:4" x="302" y="130" width="36" height="170" rx="6"/>
+
+      <g class="coin-g" style="--i:0;--h:60">
+        <circle class="coin" cx="80" cy="284" r="16"/>
+        <circle class="coin2" cx="80" cy="284" r="9"/>
+      </g>
+
+      <g class="coin-g" style="--i:1;--h:95">
+        <circle class="coin" cx="140" cy="284" r="16"/>
+        <circle class="coin2" cx="140" cy="284" r="9"/>
+      </g>
+
+      <g class="coin-g" style="--i:2;--h:80">
+        <circle class="coin" cx="200" cy="284" r="16"/>
+        <circle class="coin2" cx="200" cy="284" r="9"/>
+      </g>
+
+      <g class="coin-g" style="--i:3;--h:130">
+        <circle class="coin" cx="260" cy="284" r="16"/>
+        <circle class="coin2" cx="260" cy="284" r="9"/>
+      </g>
+
+      <g class="coin-g" style="--i:4;--h:170">
+        <circle class="coin" cx="320" cy="284" r="16"/>
+        <circle class="coin2" cx="320" cy="284" r="9"/>
+      </g>
+
+      <path class="line" pathLength="1" d="M80 224 L140 189 L200 204 L260 154 L320 114"/>
+    </svg>
+  </main>
+
+  <script>
+    (function () {
+      var splash = document.getElementById("s");
+      var amount = document.getElementById("amt");
+      var raf = null;
+      var cycleTimer = null;
+      var startTime = 0;
+      var duration = 3500;
+      var target = 2840;
+
+      function formatCurrency(value) {
+        return "R$ " + Math.round(value).toLocaleString("pt-BR");
+      }
+
+      function animateAmount(now) {
+        var elapsed = (now - startTime) % duration;
+        var progress = Math.min(elapsed / 2500, 1);
+        var value = target * (1 - Math.pow(1 - progress, 3));
+
+        amount.textContent = formatCurrency(value);
+        raf = requestAnimationFrame(animateAmount);
+      }
+
+      function playCycle() {
+        splash.classList.remove("play");
+        void splash.offsetWidth;
+        splash.classList.add("play");
+      }
+
+      function start() {
+        startTime = performance.now();
+        playCycle();
+        raf = requestAnimationFrame(animateAmount);
+
+        cycleTimer = setInterval(function () {
+          playCycle();
+        }, duration);
+      }
+
+      function stop() {
+        if (raf !== null) {
+          cancelAnimationFrame(raf);
+          raf = null;
+        }
+
+        if (cycleTimer !== null) {
+          clearInterval(cycleTimer);
+          cycleTimer = null;
+        }
+      }
+
+      window.addEventListener("pagehide", stop);
+      start();
+    })();
+  </script>
+</body>
+</html>

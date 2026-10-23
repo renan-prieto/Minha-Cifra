@@ -1,15 +1,35 @@
+
 const { getDefaultConfig } = require("expo/metro-config");
 
 const config = getDefaultConfig(__dirname);
 
-config.resolver.assetExts.push("wasm");
+if (!config.resolver.assetExts.includes("html")) {
+  config.resolver.assetExts.push("html");
+}
 
-config.server.enhanceMiddleware = (middleware) => {
-	return (request, response, next) => {
-		response.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
-		response.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-		middleware(request, response, next);
-	};
+if (!config.resolver.assetExts.includes("wasm")) {
+  config.resolver.assetExts.push("wasm");
+}
+
+const previousEnhanceMiddleware = config.server.enhanceMiddleware;
+
+config.server.enhanceMiddleware = (middleware, server) => {
+  const enhancedMiddleware = previousEnhanceMiddleware
+    ? previousEnhanceMiddleware(middleware, server)
+    : middleware;
+
+  return (request, response, next) => {
+    response.setHeader(
+      "Cross-Origin-Embedder-Policy",
+      "credentialless",
+    );
+    response.setHeader(
+      "Cross-Origin-Opener-Policy",
+      "same-origin",
+    );
+
+    enhancedMiddleware(request, response, next);
+  };
 };
 
 module.exports = config;
