@@ -3,7 +3,6 @@ import { Colors } from "@/src/constants/theme";
 import { useTheme } from "@/src/context/ThemeContext";
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import React from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -49,7 +48,6 @@ export default function TabLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="newRelease"
         options={{
@@ -76,22 +74,12 @@ export default function TabLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="calculator"
         options={{
           title: "",
           tabBarIcon: ({ color }) => (
             <Feather name="percent" size={24} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="pizzaGraph"
-        options={{
-          title: "",
-          tabBarIcon: ({ color }) => (
-            <Feather name="trending-down" size={24} color={color} />
           ),
         }}
       />

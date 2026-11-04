@@ -1,18 +1,18 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  useEffect,
-} from "react";
 import User from "@/src/model/User";
-import { loginUser } from "@/src/services/userService";
 import {
-  isAuthenticated,
-  getUserData,
-  clearAuthData,
-  saveUserData,
+    clearAuthData,
+    getUserData,
+    isAuthenticated,
+    saveUserData,
 } from "@/src/services/authService";
+import { loginUser } from "@/src/services/userService";
+import React, {
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 
 export interface UserData {
   id: string;
@@ -79,16 +79,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateProfileImage = (imageUri: string) => {
-    setUser((prevUser) => {
-      if (!prevUser) {
-        return prevUser;
-      }
+    if (!user) return;
 
-      return {
-        ...prevUser,
+    const updatedUser = {
+        ...user,
         profileImage: imageUri,
       };
-    });
+
+    setUser(updatedUser);
+    void saveUserData(updatedUser);
   };
 
   const updateUser = async (updatedUser: UserData) => {

@@ -1,23 +1,23 @@
 import { useSQLiteContext } from "expo-sqlite";
 import React, {
-    createContext,
-    ReactNode,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
 import { AppState } from "react-native";
 
 import type { FinanceType } from "@/src/services/financeDatabase";
 import {
-    deleteFinanceTag,
-    getFinanceItems,
-    getFinanceTags,
-    insertFinanceItem,
-    insertFinanceTag,
-    updateFinanceTag,
+  deleteFinanceTag,
+  getFinanceItems,
+  getFinanceTags,
+  insertFinanceItem,
+  insertFinanceTag,
+  updateFinanceTag,
 } from "@/src/services/financeDatabase";
 
 const MONTH_NAMES = [
@@ -297,10 +297,23 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     await updateFinanceTag(db, type, currentName, trimmedName);
     const updateList = (tags: string[]) =>
       tags.map((tag) => (tag === currentName ? trimmedName : tag));
+    const updateItems = (items: ItemFinance[]) =>
+      items.map((item) =>
+        item.tag === currentName ? { ...item, tag: trimmedName } : item,
+      );
 
-    if (type === "earn") setTagsEarn(updateList);
-    if (type === "investment") setTagsInvestments(updateList);
-    if (type === "lost") setTagsLost(updateList);
+    if (type === "earn") {
+      setTagsEarn(updateList);
+      setItemsEarn(updateItems);
+    }
+    if (type === "investment") {
+      setTagsInvestments(updateList);
+      setItemsInvestments(updateItems);
+    }
+    if (type === "lost") {
+      setTagsLost(updateList);
+      setItemsLost(updateItems);
+    }
   }, [db]);
 
   const deleteTag = useCallback(async (type: FinanceType, tagName: string) => {
@@ -340,14 +353,19 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     [itemsLost, isCurrentPeriod],
   );
 
+  const walletItemsInvestments = useMemo(
+    () => itemsInvestments.filter(isCurrentPeriod),
+    [itemsInvestments, isCurrentPeriod],
+  );
+
   const totalEarn = useMemo(
     () => walletItemsEarn.reduce((acc, item) => acc + item.value, 0),
     [walletItemsEarn],
   );
 
   const totalInvestments = useMemo(
-    () => itemsInvestments.reduce((acc, item) => acc + item.value, 0),
-    [itemsInvestments],
+    () => walletItemsInvestments.reduce((acc, item) => acc + item.value, 0),
+    [walletItemsInvestments],
   );
 
   const totalLost = useMemo(

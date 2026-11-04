@@ -14,7 +14,7 @@ export const registerUser = async (user: User) => {
       alert("Verifique seu e-mail para confirmar a criação da conta.");
       router.replace("/signIn");
     }
-  } catch (error) {
+  } catch {
     alert("Erro ao cadastrar usuário.");
   }
 };
@@ -46,9 +46,13 @@ export const loginUser = async (user: User) => {
   }
 };
 
-export const updateUserName = async (userId: string, name: string) => {
+export const updateUserName = async (
+  userId: string,
+  name: string,
+  password: string,
+) => {
   try {
-    const response = await api.put(`/user/${userId}`, { name });
+    const response = await api.put(`/user/${userId}`, { name, password });
     return response;
   } catch (error) {
     throw error;

@@ -556,7 +556,7 @@ app.post("/chat", chatLimiter, async (req, res) => {
 
 app.put("/user/:id", async (req, res) => {
   const { id } = req.params;
-  const { name } = req.body;
+  const { name, password } = req.body || {};
   const trimmedName = typeof name === "string" ? name.trim() : "";
 
   if (!trimmedName) {
@@ -569,7 +569,17 @@ app.put("/user/:id", async (req, res) => {
     });
   }
 
+  if (typeof password !== "string" || !password) {
+    return res.status(400).json({ error: "Senha atual obrigatória." });
+  }
+
   try {
+    const user = await db("Users").where({ pk_users_id: id }).first();
+
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ error: "Usuário ou senha incorretos." });
+    }
+
     const affectedRows = await db("Users")
       .where({ pk_users_id: id })
       .update({ name: trimmedName });

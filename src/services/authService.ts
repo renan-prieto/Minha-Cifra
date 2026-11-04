@@ -90,7 +90,9 @@ export const checkAuthentication = async (): Promise<boolean> => {
 export const isAuthenticated = async (): Promise<boolean> => {
   try {
     const token = await getAuthToken();
-    return !!token;
+    if (token) return true;
+
+    return !!(await getUserData());
   } catch (error) {
     console.error("Erro ao verificar se está autenticado:", error);
     return false;

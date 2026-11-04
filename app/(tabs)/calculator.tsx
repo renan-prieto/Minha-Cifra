@@ -6,6 +6,7 @@ import { getCalcStyles } from "@/src/components/styles/stylesCalc";
 import { useTaxSettings } from "@/src/context/TaxSettingsContext";
 import { useTheme } from "@/src/context/ThemeContext";
 import { useCalculator } from "@/src/hooks/useCalculator";
+import { parseLocalizedNumber } from "@/src/utils/parseLocalizedNumber";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { ScrollView, Text, TouchableOpacity } from "react-native";
@@ -57,11 +58,10 @@ export default function Calculator() {
           salario={salario}
           focused={focused}
           onChangeSalario={(value) => {
-            if (Number.isNaN(value)) return;
             setSalario(value);
           }}
           onFocus={setFocused}
-          onCalculate={() => handleCalculate(salario)}
+          onCalculate={() => handleCalculate(parseLocalizedNumber(salario))}
         />
 
         <CalculationResultCard

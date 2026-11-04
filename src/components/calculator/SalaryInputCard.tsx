@@ -1,13 +1,12 @@
-import React from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { getCalcStyles } from "@/src/components/styles/stylesCalc";
 import { useTheme } from "@/src/context/ThemeContext";
 
 type SalaryInputCardProps = {
-  salario: number;
+  salario: string;
   focused: boolean;
-  onChangeSalario: (value: number) => void;
+  onChangeSalario: (value: string) => void;
   onFocus: (value: boolean) => void;
   onCalculate: () => void;
 };
@@ -28,10 +27,10 @@ export default function SalaryInputCard({
 
       <TextInput
         keyboardType="numeric"
-        value={salario === 0 ? "" : salario.toString()}
+        value={salario}
         onFocus={() => onFocus(true)}
         onBlur={() => onFocus(false)}
-        onChangeText={(text) => onChangeSalario(Number(text.replace(",", ".")))}
+        onChangeText={onChangeSalario}
         placeholder="Digite seu salário"
         placeholderTextColor={isDark ? "#888" : "#999"}
         selectionColor="#2563EB"

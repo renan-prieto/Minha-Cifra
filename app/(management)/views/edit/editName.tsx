@@ -4,13 +4,13 @@ import { useTheme } from "@/src/context/ThemeContext";
 import { useUser } from "@/src/context/UserContext";
 import { updateUserName } from "@/src/services/userService";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -19,6 +19,7 @@ export default function EditNameScreen() {
   const { user, updateUser } = useUser();
   const styles = getEditFieldStyles(isDark);
   const [name, setName] = useState(user?.name ?? "");
+  const [password, setPassword] = useState("");
 
   const handleSave = async () => {
     const trimmedName = name.trim();
@@ -28,13 +29,18 @@ export default function EditNameScreen() {
       return;
     }
 
+    if (!password) {
+      alert("Digite sua senha atual para confirmar a alteração.");
+      return;
+    }
+
     if (!user?.id) {
       alert("Não foi possível identificar o usuário.");
       return;
     }
 
     try {
-      await updateUserName(user.id, trimmedName);
+      await updateUserName(user.id, trimmedName, password);
       await updateUser({ ...user, name: trimmedName });
       router.back();
     } catch (error: any) {
@@ -56,6 +62,16 @@ export default function EditNameScreen() {
               onChangeText={setName}
               placeholder="Digite seu nome"
               placeholderTextColor={isDark ? "#888" : "#999"}
+            />
+            <Text style={styles.label}>Senha atual</Text>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Digite sua senha atual"
+              placeholderTextColor={isDark ? "#888" : "#999"}
+              secureTextEntry
+              autoComplete="current-password"
             />
           </View>
 

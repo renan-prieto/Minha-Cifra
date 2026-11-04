@@ -4,7 +4,7 @@ import { useFinance } from "@/src/context/FinanceContext";
 import { useGraphicFilter } from "@/src/hooks/useGraphicFilter";
 
 export function useFinancialDashboard() {
-  const { balance, itemsEarn, itemsInvestments, itemsLost } = useFinance();
+  const { itemsEarn, itemsInvestments, itemsLost } = useFinance();
 
   const {
     currentPrevMonth,
@@ -33,6 +33,7 @@ export function useFinancialDashboard() {
       (acc, item) => acc + item.value,
       0,
     );
+    const balance = receitas - despesas - investimentos;
 
     const barData = [
       {
@@ -68,7 +69,6 @@ export function useFinancialDashboard() {
       maxValue,
     };
   }, [
-    balance,
     currentMonthLabel,
     currentNextMonth,
     currentPrevMonth,

@@ -2,7 +2,7 @@ import type { TaxKey } from "@/src/context/TaxSettingsContext";
 import { useMemo, useState } from "react";
 
 export function useCalculator(taxes: Record<TaxKey, boolean>) {
-  const [salario, setSalario] = useState(0);
+  const [salario, setSalario] = useState("");
   const [salarioCopy, setSalarioCopy] = useState(0);
   const [inss, setInss] = useState(0);
   const [imposto, setImposto] = useState(0);
@@ -43,7 +43,10 @@ export function useCalculator(taxes: Record<TaxKey, boolean>) {
     let impostoCalculado = 0;
     let descontoCalculado = 0;
 
-    if (baseOriginal <= 5000) return 0;
+    if (baseOriginal <= 5000) {
+      setDesconto(0);
+      return 0;
+    }
 
     if (baseCalculo > 4664.69) {
       impostoCalculado += (baseCalculo - 4664.69) * 0.275;
@@ -65,12 +68,16 @@ export function useCalculator(taxes: Record<TaxKey, boolean>) {
       descontoCalculado = 978.62 - 0.133145 * salarioBruto;
       impostoCalculado = Math.max(0, impostoCalculado - descontoCalculado);
       setDesconto(Number(descontoCalculado.toFixed(2)));
+    } else {
+      setDesconto(0);
     }
 
     return Number(impostoCalculado.toFixed(2));
   };
 
   const handleCalculate = (salarioBruto: number) => {
+    if (!Number.isFinite(salarioBruto)) return;
+
     const valorInss = calculateInss(salarioBruto);
     const valorImposto = calculateImposto(salarioBruto, valorInss);
 

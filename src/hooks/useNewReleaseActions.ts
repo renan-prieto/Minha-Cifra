@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { Alert } from "react-native";
 
 import { useFinance } from "@/src/context/FinanceContext";
+import { parseLocalizedNumber } from "@/src/utils/parseLocalizedNumber";
 
 export type ReleaseType = "earn" | "investiments" | "lost";
 
@@ -50,7 +51,7 @@ export function useNewReleaseActions({
       return;
     }
 
-    const numericValue = parseFloat(value.replace(",", "."));
+    const numericValue = parseLocalizedNumber(value);
 
     if (isNaN(numericValue) || numericValue <= 0) {
       Alert.alert("Atenção", "Informe um valor válido.");
@@ -77,7 +78,7 @@ export function useNewReleaseActions({
         return;
       }
 
-      const numericRate = parseFloat(rate.replace(",", "."));
+      const numericRate = parseLocalizedNumber(rate);
 
       if (isNaN(numericRate) || numericRate < 0) {
         Alert.alert("Atenção", "Informe uma porcentagem válida.");
