@@ -1,9 +1,7 @@
 
-import { FinanceProvider } from "@/src/context/FinanceContext";
-import { TaxSettingsProvider } from "@/src/context/TaxSettingsContext";
-import { ThemeProvider, useTheme } from "@/src/context/ThemeContext";
-import { UserProvider } from "@/src/context/UserContext";
-import { initializeDatabase } from "@/src/database/database";
+import { AppProviders } from "@/src/contexts/AppProviders";
+import { useTheme } from "@/src/contexts/ThemeContext";
+import { initializeDatabase } from "@/src/repositories/database";
 import * as NavigationBar from "expo-navigation-bar";
 import {
     DarkTheme,
@@ -98,15 +96,21 @@ export default function RootLayout() {
       <View style={styles.errorScreen}>
         <Text style={styles.errorTitle}>Não foi possível abrir o app</Text>
         <Text style={styles.errorMessage}>
-          O banco de dados local apresentou um erro. Tente recarregar a página.
+          O banco de dados local apresentou um erro.
         </Text>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => window.location.reload()}
-          style={styles.primaryButton}
-        >
-          <Text style={styles.primaryButtonText}>Recarregar página</Text>
-        </Pressable>
+        {Platform.OS === "web" ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => window.location.reload()}
+            style={styles.primaryButton}
+          >
+            <Text style={styles.primaryButtonText}>Recarregar página</Text>
+          </Pressable>
+        ) : (
+          <Text style={styles.warningMessage}>
+            Feche e abra o aplicativo novamente para tentar recuperar o banco local.
+          </Text>
+        )}
         {Platform.OS === "web" && (
           <>
             <Text style={styles.warningMessage}>
@@ -139,15 +143,9 @@ export default function RootLayout() {
       onError={handleDatabaseError}
     >
       <View style={{ flex: 1 }}>
-        <UserProvider>
-          <TaxSettingsProvider>
-            <FinanceProvider>
-              <ThemeProvider>
-                <App loading={loading} onReady={handleAppReady} />
-              </ThemeProvider>
-            </FinanceProvider>
-          </TaxSettingsProvider>
-        </UserProvider>
+        <AppProviders>
+          <App loading={loading} onReady={handleAppReady} />
+        </AppProviders>
         {loading && Platform.OS !== "web" && (
           <LoadingSplash onAnimationFinished={handleAnimationFinished} />
         )}

@@ -3,7 +3,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 import Photo from "@/src/components/profile/Photo";
 import { getProfileStyles } from "@/src/components/styles/stylesProfile";
-import { UserData } from "@/src/context/UserContext";
+import type { UserData } from "@/src/models/User";
 
 type ProfileCardProps = {
   isDark: boolean;

@@ -1,4 +1,4 @@
-import { useUser } from "@/src/context/UserContext"; // Importe o Hook
+import { useUser } from "@/src/contexts/UserContext"; // Importe o Hook
 import { Text, View } from "react-native";
 
 interface Props {

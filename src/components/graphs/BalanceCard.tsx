@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View } from "react-native";
 
 import { getBarStyles } from "@/src/components/styles/stylesBar";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 
 type BalanceCardProps = {
   balance: number;

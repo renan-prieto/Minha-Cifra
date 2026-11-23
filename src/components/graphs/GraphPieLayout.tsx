@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 import LegendList from "@/src/components/graphs/LegendList";
 import PieChart from "@/src/components/graphs/PieChart";
 import { getPizzaStyles } from "@/src/components/styles/stylesPizza";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 
 interface GraphicItem {
   id: string;
@@ -14,14 +14,12 @@ interface GraphicItem {
 interface GraphPieLayoutProps {
   data: GraphicItem[];
   maiorGasto?: string;
-  categoria?: string;
   total?: string | number;
 }
 
 export const GraphPieLayout = ({
   data,
   maiorGasto,
-  categoria,
   total,
 }: GraphPieLayoutProps) => {
   const { isDark } = useTheme();
@@ -53,8 +51,6 @@ export const GraphPieLayout = ({
       : null;
 
   const maiorGastoFinal = maiorGasto ?? maiorGastoCalculado?.title ?? "Nenhum";
-
-  const categoriaFinal = categoria ?? maiorGastoCalculado?.title ?? "Nenhuma";
 
   const totalCalculado = pieData.reduce((acc, item) => acc + item.value, 0);
 

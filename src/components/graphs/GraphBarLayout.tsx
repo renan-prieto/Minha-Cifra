@@ -4,7 +4,7 @@ import { Text, View } from "react-native";
 import GraphBars from "@/src/components/graphs/GraphBars";
 import GraphLegend from "@/src/components/graphs/GraphLegend";
 import { getBarStyles } from "@/src/components/styles/stylesBar";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 
 // Definição das props que o componente deve receber
 interface GraphBarLayoutProps {

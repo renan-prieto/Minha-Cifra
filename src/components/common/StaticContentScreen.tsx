@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ArrowBackHeader } from "@/src/components/common/arrowBackHeader";
 import { getStaticStyle } from "@/src/components/styles/stylesStatic";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 
 type StaticContentScreenProps = {
   title: string;

@@ -10,10 +10,37 @@ const { rateLimit } = require("express-rate-limit");
 const { buildGroundingContext, retrieveRelevantDocuments } = require("./rag");
 
 const app = express();
+
+app.disable("x-powered-by");
+
+if (process.env.TRUST_PROXY) {
+  const trustProxy = Number(process.env.TRUST_PROXY);
+  app.set("trust proxy", Number.isNaN(trustProxy) ? process.env.TRUST_PROXY : trustProxy);
+}
+
+const allowedOrigins = (process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+// Em produção, sem CORS_ORIGINS, nenhuma origem de navegador é autorizada.
+// Aplicativos móveis não dependem de CORS e continuam funcionando.
+const corsOptions = allowedOrigins.length
+  ? { origin: allowedOrigins }
+  : process.env.NODE_ENV === "production"
+    ? { origin: false }
+    : undefined;
+
+app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  res.set("X-Content-Type-Options", "nosniff");
+  res.set("X-Frame-Options", "DENY");
+  res.set("Referrer-Policy", "no-referrer");
+  next();
+});
 app.use("/chat", express.json({ limit: "100kb" }));
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: false, limit: "10kb" }));
-app.use(cors());
 
 if (!process.env.DB_USER) {
   throw new Error("Defina DB_USER no ambiente antes de iniciar a API.");
@@ -30,37 +57,55 @@ const db = knex({
   pool: { min: 0, max: 10 },
 });
 
+const isTestEnvironment = process.env.NODE_ENV === "test";
+const rateLimitMax = (limit) => (isTestEnvironment ? 10000 : limit);
+
 const registrationLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  limit: 5,
+  limit: rateLimitMax(5),
   standardHeaders: "draft-8",
   legacyHeaders: false,
 });
 
 const resendLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  limit: 3,
+  limit: rateLimitMax(3),
   standardHeaders: "draft-8",
   legacyHeaders: false,
 });
 
 const verificationLimiter = rateLimit({
   windowMs: 60 * 1000,
-  limit: 10,
+  limit: rateLimitMax(10),
   standardHeaders: "draft-8",
   legacyHeaders: false,
 });
 
 const passwordResetLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  limit: 5,
+  limit: rateLimitMax(5),
   standardHeaders: "draft-8",
   legacyHeaders: false,
 });
 
 const chatLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 30,
+  limit: rateLimitMax(30),
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: rateLimitMax(10),
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Muitas tentativas de login. Tente novamente mais tarde." },
+});
+
+const accountLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: rateLimitMax(20),
   standardHeaders: "draft-8",
   legacyHeaders: false,
 });
@@ -75,6 +120,62 @@ const createVerificationToken = () => crypto.randomBytes(32).toString("base64url
 
 const hashVerificationToken = (token) =>
   crypto.createHash("sha256").update(token).digest("hex");
+
+const SESSION_DURATION_DAYS = 30;
+
+const issueSession = async (userId) => {
+  const token = createVerificationToken();
+
+  await db("Sessions").insert({
+    session_token_hash: hashVerificationToken(token),
+    user_id: userId,
+    created_at: db.fn.now(),
+    expires_at: db.raw(`DATE_ADD(NOW(), INTERVAL ${SESSION_DURATION_DAYS} DAY)`),
+  });
+
+  return token;
+};
+
+const getSessionUser = async (token) => {
+  if (typeof token !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(token)) {
+    return null;
+  }
+
+  return db("Sessions as s")
+    .join("Users as u", "u.pk_users_id", "s.user_id")
+    .select("u.pk_users_id as id", "u.name", "u.email")
+    .where("s.session_token_hash", hashVerificationToken(token))
+    .where("s.expires_at", ">", db.fn.now())
+    .first();
+};
+
+const requireAuth = async (req, res, next) => {
+  try {
+    const authorization = req.get("authorization") || "";
+    const [scheme, token] = authorization.split(" ");
+
+    if (scheme !== "Bearer" || !token) {
+      return res.status(401).json({ error: "Sessão inválida ou expirada." });
+    }
+
+    const user = await getSessionUser(token);
+
+    if (!user) {
+      return res.status(401).json({
+        error: "Sessão inválida ou expirada. Entre novamente.",
+        code: "SESSION_EXPIRED",
+      });
+    }
+
+    req.auth = user;
+    req.sessionToken = token;
+
+    return next();
+  } catch (error) {
+    console.error("Erro ao validar sessão:", error.code || "UNKNOWN");
+    return res.status(503).json({ error: "Não foi possível validar a sessão agora." });
+  }
+};
 
 const sendVerificationEmail = async (email, token) => {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, EMAIL_FROM, PUBLIC_API_URL } = process.env;
@@ -418,6 +519,9 @@ app.post("/reset-password", passwordResetLimiter, async (req, res) => {
       return res.status(400).type("html").send("<p>Link de redefinição inválido ou expirado.</p>");
     }
 
+    // Uma redefinição de senha deve encerrar sessões antigas (ex.: conta invadida).
+    await db("Sessions").where({ user_id: user.pk_users_id }).delete();
+
     return res.status(200).type("html").send("<p>Senha atualizada. Você já pode entrar no Minha Cifra com a nova senha.</p>");
   } catch (error) {
     console.error("Erro ao redefinir senha:", error.code || "UNKNOWN");
@@ -425,18 +529,18 @@ app.post("/reset-password", passwordResetLimiter, async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", loginLimiter, async (req, res) => {
   const email = normalizeEmail(req.body?.email);
   const password = req.body?.password;
 
-  if (!isValidEmail(email) || typeof password !== "string") {
+  if (!isValidEmail(email) || typeof password !== "string" || !password) {
     return res.status(400).json({ error: "E-mail ou senha incorretos." });
   }
 
   try {
     const user = await db("Users").where({ email }).first();
 
-    if (!user) {
+    if (!user || typeof user.password !== "string") {
       return res.status(401).json({ error: "E-mail ou senha incorretos." });
     }
 
@@ -453,8 +557,11 @@ app.post("/login", async (req, res) => {
       });
     }
 
+    const token = await issueSession(user.pk_users_id);
+
     return res.status(200).json({
       message: "Login realizado com sucesso!",
+      token,
       user: {
         id: user.pk_users_id,
         name: user.name,
@@ -467,7 +574,30 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.post("/chat", chatLimiter, async (req, res) => {
+app.get("/auth/verify", requireAuth, (req, res) => {
+  return res.status(200).json({
+    user: {
+      id: req.auth.id,
+      name: req.auth.name,
+      email: req.auth.email,
+    },
+  });
+});
+
+app.post("/auth/logout", requireAuth, async (req, res) => {
+  try {
+    await db("Sessions")
+      .where({ session_token_hash: hashVerificationToken(req.sessionToken) })
+      .delete();
+
+    return res.status(200).json({ message: "Sessão encerrada." });
+  } catch (error) {
+    console.error("Erro ao encerrar sessão:", error.code || "UNKNOWN");
+    return res.status(503).json({ error: "Não foi possível encerrar a sessão agora." });
+  }
+});
+
+const handleChatRequest = async (req, res) => {
   const conversation = req.body?.messages;
 
   if (
@@ -552,21 +682,36 @@ app.post("/chat", chatLimiter, async (req, res) => {
     console.error("Falha ao consultar o provedor de IA:", error.name || "UNKNOWN");
     return res.status(502).json({ error: "Não foi possível conectar ao assistente agora. Tente novamente." });
   }
+};
+
+app.post("/chat", requireAuth, chatLimiter, handleChatRequest);
+
+// Modo visitante do app (testes): permite usar o assistente sem conta,
+// com limite mais restrito por IP.
+const guestChatLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: rateLimitMax(10),
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
 });
 
-app.put("/user/:id", async (req, res) => {
+app.post("/chat/guest", guestChatLimiter, handleChatRequest);
+
+app.put("/user/:id", accountLimiter, requireAuth, async (req, res) => {
   const { id } = req.params;
   const { name, password } = req.body || {};
   const trimmedName = typeof name === "string" ? name.trim() : "";
 
-  if (!trimmedName) {
-    return res.status(400).json({ error: "Nome obrigatório." });
+  if (!/^\d+$/.test(id)) {
+    return res.status(400).json({ error: "ID do usuário inválido." });
   }
 
-  if (!id || id === "undefined") {
-    return res.status(400).json({
-      error: "ID do usuário não informado.",
-    });
+  if (String(req.auth.id) !== id) {
+    return res.status(403).json({ error: "Você só pode alterar a própria conta." });
+  }
+
+  if (!trimmedName || trimmedName.length > 80) {
+    return res.status(400).json({ error: "O nome deve ter entre 1 e 80 caracteres." });
   }
 
   if (typeof password !== "string" || !password) {
@@ -576,17 +721,15 @@ app.put("/user/:id", async (req, res) => {
   try {
     const user = await db("Users").where({ pk_users_id: id }).first();
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (
+      !user ||
+      typeof user.password !== "string" ||
+      !(await bcrypt.compare(password, user.password))
+    ) {
       return res.status(401).json({ error: "Usuário ou senha incorretos." });
     }
 
-    const affectedRows = await db("Users")
-      .where({ pk_users_id: id })
-      .update({ name: trimmedName });
-
-    if (affectedRows === 0) {
-      return res.status(404).json({ error: "Usuário não encontrado." });
-    }
+    await db("Users").where({ pk_users_id: id }).update({ name: trimmedName });
 
     return res.status(200).json({
       message: "Nome atualizado com sucesso!",
@@ -598,26 +741,28 @@ app.put("/user/:id", async (req, res) => {
   }
 });
 
-app.delete("/user/:id", async (req, res) => {
+app.delete("/user/:id", accountLimiter, requireAuth, async (req, res) => {
   const { id } = req.params;
-  const { password } = req.body;
+  const { password } = req.body || {};
 
-  if (!password) {
-    return res.status(400).json({
-      error: "A senha é obrigatória para confirmar a exclusão.",
-    });
+  if (!/^\d+$/.test(id)) {
+    return res.status(400).json({ error: "ID do usuário inválido." });
   }
 
-  if (!id || id === "undefined") {
+  if (String(req.auth.id) !== id) {
+    return res.status(403).json({ error: "Você só pode excluir a própria conta." });
+  }
+
+  if (typeof password !== "string" || !password) {
     return res.status(400).json({
-      error: "ID do usuário não informado.",
+      error: "A senha é obrigatória para confirmar a exclusão.",
     });
   }
 
   try {
     const user = await db("Users").where({ pk_users_id: id }).first();
 
-    if (!user) {
+    if (!user || typeof user.password !== "string") {
       return res.status(404).json({ error: "Usuário não encontrado." });
     }
 
@@ -627,16 +772,15 @@ app.delete("/user/:id", async (req, res) => {
       return res.status(401).json({ error: "Senha incorreta." });
     }
 
+    // Remove as sessões antes da conta; a FK pode não ter cascade em bancos antigos.
+    await db("Sessions").where({ user_id: id }).delete();
     await db("Users").where({ pk_users_id: id }).delete();
 
     return res.status(200).json({
       message: "Conta deletada com sucesso!",
     });
   } catch (error) {
-    console.error(
-      "Erro na rota de exclusão:",
-      error,
-    );
+    console.error("Erro na rota de exclusão:", error);
 
     return res.status(500).json({
       error: "Erro interno no servidor.",
@@ -644,6 +788,30 @@ app.delete("/user/:id", async (req, res) => {
   }
 });
 
-app.listen(3000, '0.0.0.0', () => {
-  console.log('Servidor rodando na porta 3000');
+// Erros de parsing (JSON inválido, corpo grande etc.) respondem em JSON.
+app.use((error, req, res, next) => {
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  if (error?.type === "entity.too.large") {
+    return res.status(413).json({ error: "Requisição muito grande." });
+  }
+
+  if (error instanceof SyntaxError && "body" in error) {
+    return res.status(400).json({ error: "JSON inválido." });
+  }
+
+  console.error("Erro não tratado:", error?.message || "UNKNOWN");
+  return res.status(500).json({ error: "Erro interno no servidor." });
 });
+
+const port = Number(process.env.PORT) || 3000;
+
+if (require.main === module) {
+  app.listen(port, "0.0.0.0", () => {
+    console.log(`Servidor rodando na porta ${port}`);
+  });
+}
+
+module.exports = app;

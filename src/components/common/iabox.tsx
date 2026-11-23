@@ -1,5 +1,5 @@
 import { getHomeStyles } from "@/src/components/styles/stylesHome";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";

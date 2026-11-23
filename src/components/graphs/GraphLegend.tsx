@@ -2,7 +2,7 @@ import { ThemedText } from "@/src/components/expo/themed-text";
 import { View } from "react-native";
 import { BAR_COLORS } from "./colors";
 import { getGraphLegendStyle } from "@/src/components/styles/stylesGraphLegend";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 
 export default function GraphLegend() {
   const { isDark } = useTheme();

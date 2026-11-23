@@ -53,13 +53,13 @@ export default function RegisterForm({
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
-
-      <ButtonSignUp onPress={onRegister} />
-
       <LinkTermos
         checked={acceptedTerms}
         onCheckedChange={setAcceptedTerms}
       />
+      <ButtonSignUp onPress={onRegister} />
+
+      
 
       <DivisorLabel />
 

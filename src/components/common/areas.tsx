@@ -4,11 +4,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from "react-native";
 import { getSignStyles } from "../styles/stylesSign";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 
 interface AreaProps {
   value: string;

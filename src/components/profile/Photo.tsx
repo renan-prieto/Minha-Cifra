@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Image,
   StyleProp,
@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import { getProfileStyles } from "@/src/components/styles/stylesProfile";
-import { UserData } from "@/src/context/UserContext";
+import type { UserData } from "@/src/models/User";
 
 type PhotoProps = {
   isDark: boolean;
@@ -38,22 +38,21 @@ export default function Photo({
   placeholderLabel = "Adicionar foto",
 }: PhotoProps) {
   const styles = getProfileStyles(isDark);
-  const [imageLoadError, setImageLoadError] = useState(false);
-
-  useEffect(() => {
-    setImageLoadError(false);
-  }, [user?.profileImage]);
+  const [failedImageUri, setFailedImageUri] = useState<string | null>(null);
 
   const handleImageError = () => {
     console.warn("Erro ao carregar a imagem");
-    setImageLoadError(true);
+    setFailedImageUri(user?.profileImage ?? null);
   };
+
+  const showImage = Boolean(user?.profileImage && user.profileImage !== failedImageUri);
+  const imageUri = user?.profileImage;
 
   return (
     <TouchableOpacity onPress={onPickImage} style={containerStyle}>
-      {user?.profileImage && !imageLoadError ? (
+      {showImage && imageUri ? (
         <Image
-          source={{ uri: user.profileImage }}
+          source={{ uri: imageUri }}
           style={{ width: size, height: size, borderRadius: size / 2 }}
           onError={handleImageError}
         />

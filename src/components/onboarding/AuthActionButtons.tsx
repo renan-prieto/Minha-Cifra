@@ -7,12 +7,14 @@ type AuthActionButtonsProps = {
   isDark: boolean;
   onSignIn: () => void;
   onSignUp: () => void;
+  onGuest: () => void;
 };
 
 export default function AuthActionButtons({
   isDark,
   onSignIn,
   onSignUp,
+  onGuest,
 }: AuthActionButtonsProps) {
   const styles = getOnboardingStyles(isDark);
 
@@ -32,6 +34,18 @@ export default function AuthActionButtons({
         activeOpacity={0.8}
       >
         <Text style={styles.buttonSecondaryText}>Criar nova conta</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={onGuest}
+        activeOpacity={0.7}
+        accessibilityRole="link"
+        accessibilityLabel="Entrar sem conta no modo de teste"
+        style={styles.guestLinkContainer}
+      >
+        <Text style={styles.guestLinkText}>
+          Entrar sem conta (modo de teste)
+        </Text>
       </TouchableOpacity>
     </View>
   );

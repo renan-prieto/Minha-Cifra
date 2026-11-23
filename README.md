@@ -32,3 +32,39 @@ O ecossistema é dividido em três camadas principais estruturadas sob o princí
 ### Banco de Dados
 * **MariaDB** (Rodando localmente)
 * **DBeaver** como ferramenta de gerenciamento (SGDB)
+
+---
+
+## Configuração do aplicativo
+
+Crie um arquivo `.env` na raiz (baseado em `.env.example`) definindo a URL da API:
+
+```sh
+EXPO_PUBLIC_API_URL=http://SEU_IP_LOCAL:3000
+```
+
+Se a variável não for definida em desenvolvimento, o app tenta usar automaticamente o host do Metro na porta `3000`. Em produção/build, defina `EXPO_PUBLIC_API_URL` com a URL HTTPS pública da API.
+
+A autenticação usa sessões emitidas por `POST /login`. Antes de usar o backend em uma base existente, aplique as migrações de `api-node/migrations` (inclusive `003_sessions.sql`), conforme o `api-node/README.md`.
+
+## Testes
+
+O app usa **Jest** com o preset `jest-expo` e **Testing Library**. Os testes cobrem utilitários, modelos, repositórios, contexts e ViewModels em `src/**/__tests__`.
+
+```sh
+npm test              # executa a suíte do app
+npm run test:watch    # executa em modo watch
+npm run test:coverage # gera o relatório de cobertura em coverage/
+```
+
+Para executar a suíte do app e a suíte de integração da API em sequência:
+
+```sh
+npm run test:all
+```
+
+Os testes da API ficam em `api-node/test` e sobem o servidor Express com um banco em memória, sem exigir MariaDB nem credenciais externas. Consulte o `api-node/README.md` para os detalhes.
+
+## Modo visitante (testes)
+
+As telas de onboarding e login possuem o link **Entrar sem conta (modo de teste)**. Ele cria uma sessão apenas local, sem conta e sem token no servidor, mantendo todas as funcionalidades liberadas. Os lançamentos financeiros ficam isolados no usuário visitante do aparelho, separados das contas reais. O assistente de IA usa `POST /chat/guest`, que tem limite próprio por IP.

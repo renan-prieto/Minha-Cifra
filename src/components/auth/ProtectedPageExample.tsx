@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
-import { useUser } from "@/src/context/UserContext";
-import { useIsAuthenticated } from "@/src/hooks/useIsAuthenticated";
+import { useUser } from "@/src/contexts/UserContext";
+import { useIsAuthenticatedViewModel } from "@/src/viewmodels/useIsAuthenticatedViewModel";
 
 /**
  * Exemplo de página protegida que verifica autenticação
@@ -9,7 +9,7 @@ import { useIsAuthenticated } from "@/src/hooks/useIsAuthenticated";
  */
 export default function ProtectedPageExample() {
   const { user, signOut } = useUser();
-  const { isAuthenticated, isLoading } = useIsAuthenticated();
+  const { isAuthenticated, isLoading } = useIsAuthenticatedViewModel();
 
   const handleLogout = async () => {
     await signOut();

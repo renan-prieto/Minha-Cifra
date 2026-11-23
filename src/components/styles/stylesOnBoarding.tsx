@@ -149,6 +149,18 @@ export const getOnboardingStyles = (isDark: boolean) =>
       color: isDark ? "#8FC5FF" : "#006BFF",
     },
 
+    guestLinkContainer: {
+      alignItems: "center",
+      paddingVertical: 10,
+    },
+
+    guestLinkText: {
+      fontSize: 14,
+      fontWeight: "800",
+      color: isDark ? "#8FC5FF" : "#006BFF",
+      textDecorationLine: "underline",
+    },
+
     onboardingImage: {
       width: "100%",
       height: 450,

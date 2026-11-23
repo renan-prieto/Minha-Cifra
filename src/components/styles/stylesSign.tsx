@@ -179,6 +179,28 @@ export const getSignStyles = (isDark: boolean) =>
       color: isDark ? "#DCEBFF" : "#64748B",
     },
 
+    guestContainer: {
+      alignItems: "center",
+      marginTop: 22,
+      paddingTop: 16,
+      borderTopWidth: 1,
+      borderTopColor: isDark ? "#1E3556" : "#E2EAF4",
+    },
+
+    guestLink: {
+      fontSize: 14,
+      fontWeight: "800",
+      color: isDark ? "#8FC5FF" : "#006BFF",
+      textDecorationLine: "underline",
+    },
+
+    guestHint: {
+      marginTop: 6,
+      fontSize: 12,
+      textAlign: "center",
+      color: isDark ? "#9FB7D6" : "#64748B",
+    },
+
         termsContainer: {
       flexDirection: "row",
       alignItems: "flex-start",

@@ -1,12 +1,7 @@
-import { ItemFinance } from "@/src/context/FinanceContext";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-interface NewItemFinance {
-  title: string | null;
-  value: number;
-  tag: string;
-}
+import type { ItemFinance } from "@/src/models/Finance";
 
 interface WalletCardProps {
   title: string;
@@ -15,12 +10,6 @@ interface WalletCardProps {
   hidden: boolean;
   styles: any;
   type: "earn" | "investments" | "lost";
-  onToggle: () => void;
-  button: React.ReactNode;
-  modal: boolean;
-  setModal: (value: boolean) => void;
-  onAddItem: (item: NewItemFinance) => void;
-  onAddTag: (tag: string) => void;
 }
 
 export default function WalletCard({

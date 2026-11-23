@@ -20,5 +20,8 @@
     "knex": "^3.3.0",
     "mysql2": "^3.22.3",
     "nodemailer": "^10.0.14"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.2"
   }
 }

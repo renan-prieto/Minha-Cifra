@@ -1,6 +1,6 @@
 import { ThemedText } from "@/src/components/expo/themed-text";
 import { getGraphLegendStyle } from "@/src/components/styles/stylesGraphLegend";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 import { TouchableOpacity, View } from "react-native";
 
 interface Props {

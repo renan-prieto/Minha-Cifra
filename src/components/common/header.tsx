@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { ThemedText } from "@/src/components/expo/themed-text";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 import { getHeaderStyle } from "@/src/components/styles/stylesHeader";
 
 type HeaderProps = {

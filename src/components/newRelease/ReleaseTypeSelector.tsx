@@ -2,7 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
 import { getNewReleaseStyles } from "@/src/components/styles/stylesNewRelease";
-import { ReleaseType } from "@/src/hooks/useNewReleaseActions";
+import type { ReleaseType } from "@/src/models/Finance";
 
 type ReleaseTypeSelectorProps = {
   type: ReleaseType;

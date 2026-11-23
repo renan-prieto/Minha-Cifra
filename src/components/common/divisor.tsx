@@ -1,8 +1,8 @@
 import React from "react";
-import { Text, View, useColorScheme } from "react-native";
+import { Text, View } from "react-native";
 
 import { getSignStyles } from "../styles/stylesSign";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 
 export const DivisorLabel = () => {
   const { isDark } = useTheme();

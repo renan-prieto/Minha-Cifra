@@ -1,9 +1,9 @@
 
 import { ThemedText } from "@/src/components/expo/themed-text";
 import { getPizzaStyles } from "@/src/components/styles/stylesPizza";
-import { useTheme } from "@/src/context/ThemeContext";
-import { useEffect, useRef } from "react";
-import { Animated, View } from "react-native";
+import { useTheme } from "@/src/contexts/ThemeContext";
+import { useEffect, useState } from "react";
+import { Animated, Platform, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { GRAPH_COLORS } from "./colors";
 
@@ -20,7 +20,7 @@ interface Props {
 export default function PieChart({ data }: Props) {
   const { isDark } = useTheme();
   const pizzaStyles = getPizzaStyles(isDark);
-  const progress = useRef(new Animated.Value(0)).current;
+  const [progress] = useState(() => new Animated.Value(0));
 
   const dataKey = data.map((item) => `${item.id}:${item.value}`).join("|");
 
@@ -30,7 +30,7 @@ export default function PieChart({ data }: Props) {
     const animation = Animated.timing(progress, {
       toValue: 1,
       duration: 700,
-      useNativeDriver: true,
+      useNativeDriver: Platform.OS !== "web",
     });
 
     animation.start();
@@ -54,7 +54,13 @@ export default function PieChart({ data }: Props) {
     );
   }
 
-  let accumulated = 0;
+  const segments = data.map((item, index) => ({
+    item,
+    strokeLength: circumference * (item.value / total),
+    offset: data
+      .slice(0, index)
+      .reduce((sum, previous) => sum + circumference * (previous.value / total), 0),
+  }));
 
   return (
     <View style={pizzaStyles.chartWrapper}>
@@ -72,27 +78,20 @@ export default function PieChart({ data }: Props) {
         }}
       >
         <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-          {data.map((item, index) => {
-            const strokeLength = circumference * (item.value / total);
-
-            const circle = (
-              <Circle
-                key={item.id}
-                cx={center}
-                cy={center}
-                r={radius}
-                fill="transparent"
-                stroke={GRAPH_COLORS[index % GRAPH_COLORS.length]}
-                strokeWidth={radius * 2}
-                strokeDasharray={`${strokeLength} ${circumference}`}
-                strokeDashoffset={-accumulated}
-                transform={`rotate(-90 ${center} ${center})`}
-              />
-            );
-
-            accumulated += strokeLength;
-            return circle;
-          })}
+          {segments.map(({ item, strokeLength, offset }, index) => (
+            <Circle
+              key={item.id}
+              cx={center}
+              cy={center}
+              r={radius}
+              fill="transparent"
+              stroke={GRAPH_COLORS[index % GRAPH_COLORS.length]}
+              strokeWidth={radius * 2}
+              strokeDasharray={`${strokeLength} ${circumference}`}
+              strokeDashoffset={-offset}
+              transform={`rotate(-90 ${center} ${center})`}
+            />
+          ))}
         </Svg>
       </Animated.View>
     </View>

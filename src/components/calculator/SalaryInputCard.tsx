@@ -1,7 +1,7 @@
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { getCalcStyles } from "@/src/components/styles/stylesCalc";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 
 type SalaryInputCardProps = {
   salario: string;

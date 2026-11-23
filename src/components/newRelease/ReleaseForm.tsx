@@ -2,7 +2,7 @@ import React from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { getNewReleaseStyles } from "@/src/components/styles/stylesNewRelease";
-import { ReleaseType } from "@/src/hooks/useNewReleaseActions";
+import type { ReleaseType } from "@/src/models/Finance";
 
 type ReleaseFormProps = {
   isDark: boolean;

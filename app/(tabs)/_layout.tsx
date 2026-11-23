@@ -1,14 +1,24 @@
 import { HapticTab } from "@/src/components/expo/haptic-tab";
 import { Colors } from "@/src/constants/theme";
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
+import { useUser } from "@/src/contexts/UserContext";
 import { Feather } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const { isDark } = useTheme();
+  const { user, isLoading } = useUser();
   const insets = useSafeAreaInsets();
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (!user) {
+    return <Redirect href="/(auth)/signIn" />;
+  }
 
   return (
     <Tabs

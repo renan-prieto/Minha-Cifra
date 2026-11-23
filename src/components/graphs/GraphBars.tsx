@@ -1,9 +1,9 @@
 
 import { ThemedText } from "@/src/components/expo/themed-text";
 import { getBarStyles } from "@/src/components/styles/stylesBar";
-import { useTheme } from "@/src/context/ThemeContext";
-import { useEffect, useRef } from "react";
-import { Alert, Animated, View } from "react-native";
+import { useTheme } from "@/src/contexts/ThemeContext";
+import { useEffect, useState } from "react";
+import { Alert, Animated, Platform, View } from "react-native";
 import GraphBar from "./GraphBar";
 import { BAR_COLORS } from "./colors";
 
@@ -19,7 +19,7 @@ function AnimatedEntry({
   children: React.ReactNode;
   delay?: number;
 }) {
-  const progress = useRef(new Animated.Value(0)).current;
+  const [progress] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     progress.setValue(0);
@@ -29,7 +29,7 @@ function AnimatedEntry({
       Animated.timing(progress, {
         toValue: 1,
         duration: 500,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== "web",
       }),
     ]);
 

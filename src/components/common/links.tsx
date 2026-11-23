@@ -1,4 +1,4 @@
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -111,6 +111,28 @@ export const LinkCadastro: React.FC<LinkLabelProps> = ({ onPress }) => {
       <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
         <Text style={styles.link}>CADASTRE-SE</Text>
       </TouchableOpacity>
+    </View>
+  );
+};
+
+export const LinkVisitante: React.FC<LinkLabelProps> = ({ onPress }) => {
+  const { isDark } = useTheme();
+  const styles = getSignStyles(isDark);
+
+  return (
+    <View style={styles.guestContainer}>
+      <TouchableOpacity
+        onPress={onPress}
+        activeOpacity={0.7}
+        accessibilityRole="link"
+        accessibilityLabel="Entrar sem conta no modo de teste"
+      >
+        <Text style={styles.guestLink}>Entrar sem conta (modo de teste)</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.guestHint}>
+        Explore todas as funções sem criar cadastro.
+      </Text>
     </View>
   );
 };

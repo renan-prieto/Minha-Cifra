@@ -1,0 +1,89 @@
+import { router } from "expo-router";
+import User from "../models/User";
+import { api } from "./api";
+import { saveAuthToken, saveUserData } from "./authRepository";
+
+export const registerUser = async (user: User) => {
+  try {
+    const response = await api.post("/register", {
+      email: user.getEmail(),
+      password: user.getPassword(),
+    });
+
+    if (response.status === 202) {
+      alert("Verifique seu e-mail para confirmar a criação da conta.");
+      router.replace("/signIn");
+    }
+  } catch {
+    alert("Erro ao cadastrar usuário.");
+  }
+};
+
+export const loginUser = async (user: User) => {
+  const response = await api.post("/login", {
+    email: user.getEmail(),
+    password: user.getPassword(),
+  });
+
+  if (response.status === 200) {
+    if (!response.data?.token) {
+      throw new Error("O servidor não retornou uma sessão válida.");
+    }
+
+    await saveAuthToken(response.data.token);
+
+    const userData = {
+      id: String(response.data.user.id),
+      email: response.data.user.email,
+      name: response.data.user.name || user.getEmail().split("@")[0],
+      profileImage: response.data.user.profileImage || undefined,
+    };
+    await saveUserData(userData);
+  }
+
+  return response;
+};
+
+/**
+ * Encerra a sessão no servidor. Falhas de rede são ignoradas porque o
+ * encerramento local sempre deve acontecer.
+ */
+export const logoutUser = async () => {
+  try {
+    await api.post("/auth/logout");
+  } catch {
+    // A sessão local será limpa mesmo que o servidor esteja indisponível.
+  }
+};
+
+export const updateUserName = async (
+  userId: string,
+  name: string,
+  password: string,
+) => {
+  try {
+    const response = await api.put(`/user/${userId}`, { name, password });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const requestPasswordReset = async (email: string) => {
+  const response = await api.post("/request-password-reset", { email });
+  return response.data;
+};
+
+export const deleteUser = async (userId: string, password: string) => {
+  try {
+    const response = await api.delete(`/user/${userId}`, {
+      data: {
+        password,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

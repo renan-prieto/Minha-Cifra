@@ -1,4 +1,4 @@
-import { useTheme } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/contexts/ThemeContext";
 import React from "react";
 import {
     Text,

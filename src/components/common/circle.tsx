@@ -1,8 +1,8 @@
 import { ThemedText } from "@/src/components/expo/themed-text";
-import { useFinance } from "@/src/context/FinanceContext";
-import { useGraphicFilter } from "@/src/hooks/useGraphicFilter";
+import { useFinance } from "@/src/contexts/FinanceContext";
+import { useGraphicFilter } from "@/src/viewmodels/useGraphicFilter";
 import React from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 
 const radius = 35;
@@ -12,7 +12,7 @@ const Graph = () => {
   const { currentMonthLabel, currentYearLabel } = useGraphicFilter();
   const { itemsLost } = useFinance();
 
-  const filteredGraphic: Array<{ id: string; title: string; value: number }> =
+  const filteredGraphic: { id: string; title: string; value: number }[] =
     itemsLost
       .filter(
         (item) =>
@@ -37,14 +37,6 @@ const Graph = () => {
 
   const totalValue = filteredGraphic.reduce((sum, item) => sum + item.value, 0);
 
-  const handleCategoryDetails = (category: string, value: number) => {
-    const percent =
-      totalValue > 0 ? ((value / totalValue) * 100).toFixed(1) : "0";
-    Alert.alert(
-      "Detalhes da Categoria",
-      `${category}: R$ ${value.toFixed(2)} (${percent}%)`,
-    );
-  };
   return (
     <View style={styles.chartWrapper}>
       {filteredGraphic.length > 0 && totalValue > 0 ? (
