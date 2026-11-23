@@ -45,7 +45,7 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: ({ color }) => (
-            <Feather name="home" size={24} color={color} />
+            <Feather name="home" size={24} color={(color ?? undefined) as string | undefined} />
           ),
         }}
       />
@@ -54,7 +54,7 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: ({ color }) => (
-            <Feather name="bar-chart-2" size={24} color={color} />
+            <Feather name="bar-chart-2" size={24} color={(color ?? undefined) as string | undefined} />
           ),
         }}
       />
@@ -89,7 +89,7 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: ({ color }) => (
-            <Feather name="percent" size={24} color={color} />
+            <Feather name="percent" size={24} color={(color ?? undefined) as string | undefined} />
           ),
         }}
       />
@@ -98,7 +98,7 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: ({ color }) => (
-            <Feather name="user" size={24} color={color} />
+            <Feather name="user" size={24} color={(color ?? undefined) as string | undefined} />
           ),
         }}
       />

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import type { ScrollViewInstance } from "react-native";
 import Markdown from "react-native-markdown-display";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -25,7 +26,7 @@ export default function ChatView() {
   const { isDark } = useTheme();
   const styles = getChatStyles(isDark);
   const markdownStyles = getChatMarkdownStyles(isDark);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<ScrollViewInstance>(null);
 
   const {
     messages,

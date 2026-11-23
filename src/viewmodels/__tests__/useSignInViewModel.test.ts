@@ -41,30 +41,13 @@ describe("useSignInViewModel", () => {
 
     act(() => result.current.setEmail("renan@example.com"));
     act(() => result.current.setPassword("segredo"));
-    act(() => result.current.setAcceptedTerms(true));
 
     expect(result.current.email).toBe("renan@example.com");
     expect(result.current.password).toBe("segredo");
-    expect(result.current.acceptedTerms).toBe(true);
-  });
-
-  it("exige o aceite dos termos", async () => {
-    const { result } = renderHook(() => useSignInViewModel());
-
-    await act(async () => {
-      await result.current.handleLogin();
-    });
-
-    expect(alertSpy).toHaveBeenCalledWith(
-      "Atenção",
-      "Aceite os termos de uso e a política de privacidade para entrar.",
-    );
-    expect(signIn).not.toHaveBeenCalled();
   });
 
   it("exige todos os campos", async () => {
     const { result } = renderHook(() => useSignInViewModel());
-    act(() => result.current.setAcceptedTerms(true));
 
     await act(async () => {
       await result.current.handleLogin();
@@ -79,7 +62,6 @@ describe("useSignInViewModel", () => {
     act(() => {
       result.current.setEmail("renan@example.com");
       result.current.setPassword("segredo");
-      result.current.setAcceptedTerms(true);
     });
 
     await act(async () => {
@@ -105,7 +87,6 @@ describe("useSignInViewModel", () => {
     act(() => {
       result.current.setEmail("renan@example.com");
       result.current.setPassword("segredo");
-      result.current.setAcceptedTerms(true);
     });
 
     await act(async () => {
@@ -143,7 +124,6 @@ describe("useSignInViewModel", () => {
     act(() => {
       result.current.setEmail("renan@example.com");
       result.current.setPassword("segredo");
-      result.current.setAcceptedTerms(true);
     });
 
     await act(async () => {
@@ -169,7 +149,6 @@ describe("useSignInViewModel", () => {
     act(() => {
       result.current.setEmail("renan@example.com");
       result.current.setPassword("segredo");
-      result.current.setAcceptedTerms(true);
     });
 
     await act(async () => {
@@ -188,7 +167,6 @@ describe("useSignInViewModel", () => {
     act(() => {
       result.current.setEmail("renan@example.com");
       result.current.setPassword("segredo");
-      result.current.setAcceptedTerms(true);
     });
 
     await act(async () => {

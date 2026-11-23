@@ -21,13 +21,17 @@ interface AppProps {
   onReady: () => void;
 }
 
+export const unstable_settings = {
+  anchor: "modal",
+};
+
 function App({ loading, onReady }: AppProps) {
   const { isDark } = useTheme();
 
   return (
     <View style={{ flex: 1 }} onLayout={onReady}>
       <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-        <Stack initialRouteName="modal" screenOptions={{ headerShown: false }}>
+        <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="modal" options={{ presentation: "modal" }} />
         </Stack>
