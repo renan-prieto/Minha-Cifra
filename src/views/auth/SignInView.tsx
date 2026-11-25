@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 
 import LoginForm from "@/src/components/sign/LoginForm";
 import LogoHeader from "@/src/components/sign/LogoHeader";
@@ -20,17 +20,27 @@ export default function SignInView() {
   } = useSignInViewModel();
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <LogoHeader isDark={isDark} />
-      <LoginForm
-        isDark={isDark}
-        email={email}
-        password={password}
-        setEmail={setEmail}
-        setPassword={setPassword}
-        onLogin={handleLogin}
-        onGuestLogin={handleGuestLogin}
-      />
-    </View>
+
+      <ScrollView
+        style={styles.formScroll}
+        contentContainerStyle={styles.formScrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        <View style={styles.formSpacer} />
+        <LoginForm
+          isDark={isDark}
+          email={email}
+          password={password}
+          setEmail={setEmail}
+          setPassword={setPassword}
+          onLogin={handleLogin}
+          onGuestLogin={handleGuestLogin}
+        />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

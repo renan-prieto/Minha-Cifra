@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 
 import LogoHeader from "@/src/components/sign/LogoHeader";
 import RegisterForm from "@/src/components/sign/RegisterForm";
@@ -23,21 +23,30 @@ export default function SignUpView() {
   } = useSignUpViewModel();
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <LogoHeader isDark={isDark} />
 
-      <RegisterForm
-        isDark={isDark}
-        email={email}
-        password={password}
-        confirmPassword={confirmPassword}
-        setEmail={setEmail}
-        setPassword={setPassword}
-        setConfirmPassword={setConfirmPassword}
-        acceptedTerms={acceptedTerms}
-        setAcceptedTerms={setAcceptedTerms}
-        onRegister={handleRegister}
-      />
-    </View>
+      <ScrollView
+        style={styles.formScroll}
+        contentContainerStyle={styles.formScrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        <View style={styles.formSpacer} />
+        <RegisterForm
+          isDark={isDark}
+          email={email}
+          password={password}
+          confirmPassword={confirmPassword}
+          setEmail={setEmail}
+          setPassword={setPassword}
+          setConfirmPassword={setConfirmPassword}
+          acceptedTerms={acceptedTerms}
+          setAcceptedTerms={setAcceptedTerms}
+          onRegister={handleRegister}
+        />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import type { ItemFinance } from "@/src/models/Finance";
@@ -68,7 +68,7 @@ export default function WalletCard({
         <Text style={styles.cardValue}>
           {hidden
             ? "R$ •••••"
-            : `R$ ${type === "lost" ? "-" : ""}${total.toLocaleString(
+            : ` ${type === "lost" ? "-" : ""}R$${total.toLocaleString(
                 "pt-BR",
                 {
                   minimumFractionDigits: 2,

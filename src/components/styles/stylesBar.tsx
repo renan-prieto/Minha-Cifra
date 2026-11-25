@@ -82,6 +82,10 @@ export const getBarStyles = (isDark: boolean) =>
       gap: 10,
       width: "100%",
     },
+    summaryStacked: {
+      flexDirection: "column",
+      gap: 8,
+    },
     summaryCard: {
       flex: 1,
       minWidth: 0,
@@ -89,10 +93,23 @@ export const getBarStyles = (isDark: boolean) =>
       borderRadius: 18,
       padding: 14,
     },
+    summaryCardStacked: {
+      flexGrow: 0,
+      flexBasis: "auto",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 12,
+      paddingVertical: 12,
+    },
     summaryLabel: {
       color: isDark ? "#AFC3DD" : "#64748B",
       fontSize: 12,
       marginBottom: 5,
+      flexShrink: 1,
+    },
+    summaryLabelStacked: {
+      marginBottom: 0,
       flexShrink: 1,
     },
     summaryValue: {
@@ -100,6 +117,10 @@ export const getBarStyles = (isDark: boolean) =>
       fontSize: 16,
       fontWeight: "800",
       flexShrink: 1,
+    },
+    summaryValueStacked: {
+      flexShrink: 1,
+      textAlign: "right",
     },
     chartContainer: {
       flex: 1,

@@ -1,11 +1,25 @@
 import { Platform, StyleSheet } from "react-native";
 
+export const CARD_HEIGHT_RATIO = 0.68;
+
 export const getSignStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
       justifyContent: "flex-end",
       backgroundColor: isDark ? "#001B44" : "#006BFF",
+    },
+
+    formScroll: {
+      flex: 1,
+    },
+
+    formScrollContent: {
+      flexGrow: 1,
+    },
+
+    formSpacer: {
+      flexGrow: 1,
     },
 
     header: {
@@ -35,7 +49,6 @@ export const getSignStyles = (isDark: boolean) =>
 
     card: {
       backgroundColor: isDark ? "#0B1933" : "#F7F9FC",
-      minHeight: "68%",
       paddingHorizontal: 25,
       paddingTop: 35,
       paddingBottom: 55,

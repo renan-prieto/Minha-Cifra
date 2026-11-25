@@ -10,7 +10,7 @@ export default function HomeHeader({ styles }: Props) {
   
   return (
     <View style={styles.header}>
-      <Text style={styles.welcome}>Bem vindo!{user?.name}</Text>
+      <Text style={styles.welcome}>Bem vindo! {user?.name}</Text>
 
       <Text style={styles.subtitle}>Aqui está seu panorama financeiro</Text>
     </View>
